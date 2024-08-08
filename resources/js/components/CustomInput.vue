@@ -1,7 +1,7 @@
 <template>
     <div class="form-group">
         <label :for="label">{{ label }}</label>
-        <input :id="label" :type="type" class="form-control mt-1" :placeholder="placeholder" v-model="inputValue" @input="handleInput">
+        <input :id="label" :type="type" class="form-control mt-1" :placeholder="placeholder" v-model="inputValue" @input="handleInput" :disabled="disabled">
     </div>
 </template>
 
@@ -21,6 +21,10 @@ export default {
             type: String,
             default: "",
         },
+        disabled: {
+            type: Boolean,
+            default: false
+        }
     },
     data() {
         return {

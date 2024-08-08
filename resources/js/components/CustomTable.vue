@@ -6,20 +6,26 @@
         <table class="table table-striped table-bordered">
             <thead>
                 <tr>
-                    <th v-for="header in headers" :key="header">{{ header.label }}</th>
-                    <th v-if="showActions">{{ actionText }}</th> <!-- Conditionally render header -->
+                    <th v-for="(header, index) in headers" :key="index">{{ header.label }}</th>
+                    <th v-if="actions.length">{{ actions.length > 1 ? 'Actions' : actions[0].text }}</th> <!-- Conditionally render header -->
                 </tr>
             </thead>
             <tbody>
                 <tr v-if="!data.length">
-                    <td :colspan="headers.length + (showActions ? 1 : 0)" class="text-center">No records found</td>
+                    <td :colspan="headers.length + (actions.length ? 1 : 0)" class="text-center">No records found</td>
                 </tr>
-                <tr v-else v-for="(row, index) in data" :key="index">
-                    <td v-for="(header, index) in headers" :key="index">{{ row[header.key] }}</td>
-                    <td v-if="showActions">
-                        <CustomButton :clickHandler="() => handleAction(row.id)" :text="actionText" :buttonClass="'submit-button custom-button-blue mb-2'" />
-                    </td>
-                </tr>
+                <template v-else>
+                    <tr v-for="(row, index) in data" :key="index">
+                        <td v-for="(header, index) in headers" :key="index">{{ row[header.key] }}</td>
+                        <td v-if="actions.length">
+                            <div class="d-flex">
+                                <div v-for="(action, i) in actions" :key="i">
+                                    <CustomButton :clickHandler="() => handleAction(action, row.id)" :text="action.text" :buttonClass="'submit-button custom-button-blue mx-1'" />
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </template>
             </tbody>
         </table>
     </div>
@@ -42,18 +48,14 @@ export default {
             type: Array,
             required: true
         },
-        showActions: {
-            type: Boolean,
-            default: false 
-        },
-        actionText: {
-            type: String,
-            default: "Action" 
+        actions: {
+            type: Array,
+            default: () => [] 
         }
     },
     methods: {
-        handleAction(row) {
-            this.$emit('action', row); // Emit an event with the row data
+        handleAction(action, row) {
+            this.$emit('action', { action, data: row }); // Emit action with handler and rowId
         }
     }
 };

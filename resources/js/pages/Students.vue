@@ -8,7 +8,10 @@
                 :headers="headers"
                 :data="students"
                 :showActions="true"
-                actionText="Availabilities"
+                :actions="[
+                    { text: 'Availabilities', handler: handleAction, key: 'availability' },
+                    { text: 'Schedule', handler: handleAction , key: 'schedule'},
+                ]"
                 @action="handleAction"
             />
         </template>
@@ -63,8 +66,13 @@ export default {
             })
         },
 
-        handleAction(data){
-            this.$router.push({ name: 'AddAvailability', params: { id: data } });
+        handleAction(data) {
+            if(data.action.key == "availability"){
+                this.$router.push({ name: 'AddAvailability', params: { id: data.data } });
+            }
+            else if(data.action.key == 'schedule'){
+                this.$router.push({ name: 'AddSchedule', params: { id: data.data } });
+            }
         }
     },
 }

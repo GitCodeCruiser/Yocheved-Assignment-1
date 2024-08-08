@@ -7,4 +7,6 @@ export default{
 
     addAvailability : (data) => axios.post(`${baseUrl}/availability/add`,data),
     getAvailability: (data) => axios.post(`${baseUrl}/availability/get`,data),
+
+    addSchedule: (data) => axios.post(`${baseUrl}/schedule/add`,data)
 }

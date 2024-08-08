@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Http\Request;
 use App\Http\Services\StudentService;
 use App\Http\Requests\AddStudentRequest;
+use App\Http\Requests\AddScheduleRequest;
 use App\Http\Requests\AddAvailabilityRequest;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -59,6 +60,18 @@ class StudentController extends Controller
         {
             $studentAvailabilities = $this->studentService->getStudentAvailability($request);
             return $this->sendResponse("Students availabilities fetched successfully", Response::HTTP_OK, $studentAvailabilities);
+        } 
+        catch (Exception $exception) 
+        {
+            return $this->sendResponse($exception->getMessage(), $exception->getCode(), null, false);
+        }
+    }
+
+    public function addStudentSchedule(AddScheduleRequest $request){
+        try 
+        {
+            $studentSchedule = $this->studentService->addStudentSchedule($request);
+            return $this->sendResponse("Students schedule added successfully", Response::HTTP_OK, $studentSchedule);
         } 
         catch (Exception $exception) 
         {

@@ -44,12 +44,15 @@ class StudentService{
 
     public function getStudentAvailability($request){
         $student = Student::where('id', $request->student_id)->exists();
-
         if(!$student){
             throw new Exception("Please enter a valid student id", Response::HTTP_OK);
         }
 
         $studentAvailabilities = Student::where('id', $request->student_id)->with("studentAvailability")->first();
         return $studentAvailabilities;
+    }
+
+    public function addStudentSchedule($request){
+       
     }
 }
