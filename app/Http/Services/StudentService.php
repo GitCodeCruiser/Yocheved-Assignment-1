@@ -4,8 +4,10 @@ namespace App\Http\Services;
 use Exception;
 use App\Models\Session;
 use App\Models\Student;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Models\StudentAvailability;
+use Illuminate\Console\Scheduling\Schedule;
 use Symfony\Component\HttpFoundation\Response;
 
 class StudentService{
@@ -57,18 +59,28 @@ class StudentService{
 
     public function getAvailableStudents($request){
         $session = Session::where('id', $request->session_id)->first();
-        
-        if(!$session){
+
+        if (!$session) {
             throw new Exception("Please enter a valid session id", Response::HTTP_OK);
         }
 
         $date = Carbon::parse('2024-08-09');
         $day = $date->dayOfWeek;
 
-        $students = Student::withWhereHas('studentAvailability', function($query) use ($day){
-            $query->where('day', $day);
+        $students = Student::whereHas('studentAvailability', function($query) use ($session) {
+            if ($session->is_daily) {
+                // Check if the student is available all 7 days
+                $query->select('student_id')
+                      ->whereIn('day', [0, 1, 2, 3, 4, 5, 6])
+                      ->groupBy('student_id')
+                      ->havingRaw('COUNT(DISTINCT day) = 7');
+            } else {
+                // Check if the student is available on the specific day
+                $day = Carbon::now()->dayOfWeek; // Adjust according to your needs
+                $query->where('day', $day);
+            }
         })->get();
-
+        
         return $students;
     }
 }

@@ -2,44 +2,21 @@
     <div class="d-flex justify-content-center">
         <div class="custom-form custom-form-white shadow-lg" style="width: 400px;">
             <h4 class="text-bold mb-4">Add Schedule</h4>
-            {{ data }}
-            <div class="form-group">
-                <label for="">Student Name</label>
-                <input type="text" class="form-control mt-2" disabled :value="this.availabilities.full_name">
-            </div>
             <ValidationObserver v-slot="{ invalid }">
-                <form @submit.prevent="addSchedule">
-                    <label for="day">Availabilities</label>
-                    <ValidationProvider name="Day" rules="required" v-slot="{ errors }">
-                    <select v-model="data.day" class="form-control mt-2" id="day">
-                        <option value="" disabled>Select an availability</option>
-                        <option v-if="availabilities.student_availability.length === 0">No availability found</option>
-                        <option v-for="availability in availabilities.student_availability" :key="availability.id" :value="availability.id">
-                        {{ getDay(availability.id) }}
+                <form @submit.prevent="scheduleStudent()">
+                    <label for="student">Available Students</label>
+                    <ValidationProvider name="Student" rules="required" v-slot="{ errors }">
+                    <select v-model="data.student_id" class="form-control mt-2" id="student">
+                        <option value="" disabled>Select a user</option>
+                        <option v-if="students.length === 0">No student found</option>
+                        <option v-for="student in students" :key="student.id" :value="student.id">
+                        {{ student.full_name }}
                         </option>
                     </select>
                     <span class="text-danger">{{ errors[0] }}</span>
                     </ValidationProvider>
 
-                    <!-- Start Time -->
-                    <div class="form-group">
-                        <label for="start_time">Start Time</label>
-                        <ValidationProvider name="Start Time" rules="required" v-slot="{ errors }">
-                        <input v-model="data.start_time" type="datetime-local" class="form-control mt-2" id="start_time">
-                        <span class="text-danger">{{ errors[0] }}</span>
-                        </ValidationProvider>
-                    </div>
-
-                    <!-- End Time -->
-                    <div class="form-group">
-                        <label for="end_time">End Time</label>
-                        <ValidationProvider name="End Time"  rules="required" v-slot="{ errors }">
-                        <input v-model="data.end_time" type="datetime-local" class="form-control mt-2" id="end_time">
-                        <span class="text-danger">{{ errors[0] }}</span>
-                        </ValidationProvider>
-                    </div>
-
-                    <div class="d-flex justify-content-center mt-3 mb-3">
+                    <div class="d-flex justify-content-center mt-5">
                         <CustomButton type="submit" text="Add Schedule" :buttonClass="'submit-button custom-button-blue w-100'"
                         :disabled="invalid" />
                     </div>
@@ -62,13 +39,10 @@ export default {
     data() {
         return {
             isDisabled: false,
-            availabilities: {
-                student_availability: []
-            },
+            
+            students: [],
             data:{
-                day: null,
-                start_time: null,
-                end_time: null
+                student_id: null,
             }
         }
     },
@@ -79,24 +53,27 @@ export default {
     methods: {
         
         getAvailableUsers(){
-            let data = {'session_id': this.$route.params.id};
+            let data = { 'session_id': this.$route.params.id };
 
             StudentApiService.getStudentAvailabilityForSession(data).then(({data}) => {
                 if(data.status){
-                    // this.availabilities = data.data;
-                    console.log(data.data);
+                    this.students = data.data;
                 }
             });
         },
         
-        getDay(day){
-            return this.$constants.weekdays[day];
-        },
-
-        addSchedule(){
-            StudentApiService.addSchedule(this.data).then(({data}) => {
+        scheduleStudent(){
+            let data = {
+                'session_id': this.$route.params.id,
+                'student_id': this.data.student_id,
+            };
+            StudentApiService.scheduleStudent(data).then(({data}) => {
                 if(data.status){
-                    console.log('asd');
+                    this.$router.push({ name: 'Sessions' });
+                    this.$toast.success(data.message);
+                }
+                else{
+                    this.$toast.error(data.message);
                 }
             });
         }

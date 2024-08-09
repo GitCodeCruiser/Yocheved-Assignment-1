@@ -39,4 +39,16 @@ class SessionController extends Controller
             return $this->sendResponse($exception->getMessage(), $exception->getCode(), null, false);
         }
     }
+
+    public function scheduleStudent(Request $request){
+        try 
+        {
+            $studentSchedule = $this->sessionService->scheduleStudent($request);
+            return $this->sendResponse("Student scheduled successfully", Response::HTTP_OK, $studentSchedule);
+        } 
+        catch (Exception $exception) 
+        {
+            return $this->sendResponse($exception->getMessage(), $exception->getCode(), null, false);
+        }
+    }
 }

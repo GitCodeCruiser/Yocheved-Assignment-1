@@ -11,5 +11,6 @@ export default{
     getStudentAvailabilityForSession: (data) => axios.post(`${baseUrl}/availability/student-for-session`,data),
 
     
-    addSchedule: (data) => axios.post(`${baseUrl}/schedule/add`,data)
+    addSchedule: (data) => axios.post(`${baseUrl}/schedule/add`,data),
+    scheduleStudent: (data) => axios.post(`${baseUrl}/schedule/student`,data),
 }

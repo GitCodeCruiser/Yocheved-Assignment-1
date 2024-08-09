@@ -67,18 +67,6 @@ class StudentController extends Controller
         }
     }
 
-    public function addStudentSchedule(AddScheduleRequest $request){
-        try 
-        {
-            $studentSchedule = $this->studentService->addStudentSchedule($request);
-            return $this->sendResponse("Students schedule added successfully", Response::HTTP_OK, $studentSchedule);
-        } 
-        catch (Exception $exception) 
-        {
-            return $this->sendResponse($exception->getMessage(), $exception->getCode(), null, false);
-        }
-    }
-
     public function getAvailableStudents(Request $request){
         try 
         {

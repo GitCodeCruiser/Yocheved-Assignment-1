@@ -34,6 +34,7 @@ export default {
                 { label: 'Start Date Time', key: 'start_date_time' },
                 { label: 'End Date Time', key: 'end_date_time' },
                 { label: 'Target', key: 'target' },
+                { label: 'Daily', key: 'is_daily' },
             ],
             
             actions: [

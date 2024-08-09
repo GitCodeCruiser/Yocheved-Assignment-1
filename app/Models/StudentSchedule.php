@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class StudentSchedule extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'student_id',
+        'session_id',
+    ];
 }
