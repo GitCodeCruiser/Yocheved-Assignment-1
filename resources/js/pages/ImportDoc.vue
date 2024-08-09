@@ -46,40 +46,83 @@
       },
       extractDataFromText(text) {
         const dataEntries = [];
+        const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
   
-        // Pattern for "Start From" and "End To" entries (Sample 2 - TKIP format)
-        const tkipPattern = /Start From\s*(\d{4}-\d{2}-\d{2})\s*End To\s*(\d{4}-\d{2}-\d{2})\s*Target\s*(\d+)/g;
-        let match;
-        while ((match = tkipPattern.exec(text)) !== null) {
-          dataEntries.push({
-            fromDate: match[1],
-            toDate: match[2],
-            target: match[3],
-          });
+        let currentEntry = {};
+        let inSample2 = false;
+        let headersPassed = false;
+  
+        const addedEntries = new Set();
+  
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+  
+          if (line === 'Subject' || line === 'Practical Knowledge Improvement Plan (PKIP)') {
+            inSample2 = true;
+            headersPassed = false;
+            continue;
+          }
+  
+          if (inSample2) {
+            if (!headersPassed) {
+              if (line === 'Target' || line === 'Improvement target') {
+                headersPassed = true;
+              }
+              continue;
+            }
+  
+            if (line === 'History' || line === 'Economy' || line.startsWith('Bx ')) {
+              if (Object.keys(currentEntry).length > 0) {
+                this.addUniqueEntry(dataEntries, currentEntry, addedEntries);
+              }
+              currentEntry = {};
+            } else if (line.match(/^\d{4}-\d{2}-\d{2}$/)) {
+              if (!currentEntry.fromDate) {
+                currentEntry.fromDate = line;
+              } else {
+                currentEntry.toDate = line;
+              }
+            } else if (line.match(/^\d+$/)) {
+              currentEntry.target = line;
+              if (currentEntry.fromDate && currentEntry.toDate) {
+                this.addUniqueEntry(dataEntries, currentEntry, addedEntries);
+                currentEntry = {};
+              }
+            }
+          }
         }
   
-        // Pattern for "Session start date" and "Start Date" entries (Sample 1 format)
+        // Sample 1 and 3 Patterns
         const sessionPattern = /(?:Session start date|Start Date)\s*(\d{4}-\d{2}-\d{2})\s*(?:Session end date|End Date)\s*(\d{4}-\d{2}-\d{2})\s*(?:Improvement target|target)\s*(\d+)/g;
+        let match;
         while ((match = sessionPattern.exec(text)) !== null) {
-          dataEntries.push({
+          this.addUniqueEntry(dataEntries, {
             fromDate: match[1],
             toDate: match[2],
             target: match[3],
-          });
+          }, addedEntries);
         }
   
-        // Pattern for "Date to Date" format in Sample 1
         const dateRangePattern = /(\d{4}-\d{2}-\d{2})\s*to\s*(\d{4}-\d{2}-\d{2})\s*(\d+)\s*per\s*session/g;
         while ((match = dateRangePattern.exec(text)) !== null) {
-          dataEntries.push({
+          this.addUniqueEntry(dataEntries, {
             fromDate: match[1],
             toDate: match[2],
             target: match[3],
-          });
+          }, addedEntries);
         }
   
         return dataEntries;
       },
+      // Helper method to add unique entries
+      addUniqueEntry(dataEntries, entry, addedEntries) {
+        const entryKey = `${entry.fromDate}-${entry.toDate}-${entry.target}`;
+        if (!addedEntries.has(entryKey)) {
+          dataEntries.push({ ...entry });
+          addedEntries.add(entryKey);
+        }
+      }
     },
   };
   </script>
+  
