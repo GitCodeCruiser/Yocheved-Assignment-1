@@ -1,11 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Session Reminder</title>
-</head>
-<body>
-    <h1>Hello, {{ $session->user->name }}</h1>
-    <p>This is a reminder that your session "{{ $session->name }}" will start in 5 minutes.</p>
-    <p>Start Time: {{ Carbon\Carbon::parse($session->start_date_time)->format('Y-m-d H:i:s') }}</p>
-</body>
-</html>
+<x-mail::message>
+# Introduction
+
+The body of your message.
+
+<x-mail::button :url="''">
+Button Text
+</x-mail::button>
+
+Thanks,<br>
+{{ config('app.name') }}
+</x-mail::message>

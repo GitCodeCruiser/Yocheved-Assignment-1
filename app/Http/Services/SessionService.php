@@ -6,6 +6,7 @@ use Exception;
 use Carbon\Carbon;
 use App\Models\Session;
 use App\Models\Student;
+use App\Models\SessionRating;
 use App\Models\StudentSchedule;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -56,10 +57,16 @@ class SessionService
         return $session;
     }
 
-    public function getSession()
+    public function getSessions()
     {
         $sessions = Session::all();
         return $sessions;
+    }
+
+    public function getSession($request)
+    {
+        $session = Session::where('id', $request->session_id)->first();
+        return $session;
     }
 
     public function scheduleStudent($request){
@@ -89,5 +96,24 @@ class SessionService
         ]);
 
         return $studentSchedule;
+    }
+
+    public function rateSession($request){
+        $session = Session::where('id', $request->session_id)->with(['students'])->first();
+        
+        if(!$session){
+            throw new Exception("Please enter a valid session id", Response::HTTP_OK);
+        }
+
+        foreach($session->students as $student){
+            SessionRating::create([
+                'session_id' => $session->id,
+                'student_id' => $student->id,
+                'total_rating' => $session->target,
+                'obtained_rating' => $request->rating
+            ]);
+        }
+
+        return SessionRating::where('session_id', $session->id)->get();
     }
 }

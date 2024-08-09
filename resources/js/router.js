@@ -11,6 +11,7 @@ import AddAvailability from "./pages/AddAvailability.vue";
 import AddSchedule from "./pages/AddSchedule.vue";
 import Sessions from "./pages/Sessions.vue";
 import AddSession from "./pages/AddSession.vue";
+import AddRating from "./pages/AddRating.vue";
 
 Vue.use(Router);
 
@@ -33,6 +34,7 @@ const routes = [
     { path: "/sessions", name: "Sessions", component: Sessions, beforeEnter: ifAuthenticated },
     { path: "/add-session", name: "AddSession", component: AddSession, beforeEnter: ifAuthenticated },
     { path: "/add-schedule/:id", name: "AddSchedule", component: AddSchedule, beforeEnter: ifAuthenticated },
+    { path: "/add-rating/:id", name: "AddRating", component: AddRating, beforeEnter: ifAuthenticated },
 ];
 
 const router = new Router({

@@ -28,10 +28,10 @@ class SessionController extends Controller
         }
     }
 
-    public function getSession(){
+    public function getSessions(){
         try 
         {
-            $sessions = $this->sessionService->getSession();
+            $sessions = $this->sessionService->getSessions();
             return $this->sendResponse("Session fetched successfully", Response::HTTP_OK, $sessions);
         } 
         catch (Exception $exception) 
@@ -45,6 +45,30 @@ class SessionController extends Controller
         {
             $studentSchedule = $this->sessionService->scheduleStudent($request);
             return $this->sendResponse("Student scheduled successfully", Response::HTTP_OK, $studentSchedule);
+        } 
+        catch (Exception $exception) 
+        {
+            return $this->sendResponse($exception->getMessage(), $exception->getCode(), null, false);
+        }
+    }
+
+    public function addSessionRating(Request $request){
+        try 
+        {
+            $rating = $this->sessionService->rateSession($request);
+            return $this->sendResponse("Rating added successfully", Response::HTTP_OK, $rating);
+        } 
+        catch (Exception $exception) 
+        {
+            return $this->sendResponse($exception->getMessage(), $exception->getCode(), null, false);
+        }
+    }
+
+    public function getSession(Request $request){
+        try 
+        {
+            $rating = $this->sessionService->getSession($request);
+            return $this->sendResponse("Session fetched successfully", Response::HTTP_OK, $rating);
         } 
         catch (Exception $exception) 
         {

@@ -34,11 +34,18 @@ export default {
                 { label: 'Start Date Time', key: 'start_date_time' },
                 { label: 'End Date Time', key: 'end_date_time' },
                 { label: 'Target', key: 'target' },
-                { label: 'Daily', key: 'is_daily' },
+                { label: 'Daily', key: 'daily' },
+                { label: 'Status', key: 'status_column' },
             ],
             
             actions: [
-                { text: 'Create Schedule', handler: this.handleAction, key: 'assignStudent' },
+                { text: 'Create Schedule', handler: this.handleAction, key: 'assignStudent',  condition: (row) => true },
+                {
+                    text: 'Rate',
+                    key: 'rateSession',
+                    condition: (row) => row.status_column === 'completed',
+                    handler: this.handleAction
+                }
             ]
         }
     },
@@ -56,10 +63,13 @@ export default {
             if(data.action.key == "assignStudent"){
                 this.$router.push({ name: 'AddSchedule', params: { id: data.data } });
             }
+            else if(data.action.key == "rateSession"){
+                this.$router.push({ name: 'AddRating', params: { id: data.data } });
+            }
         },
 
         getSessions(){
-            SessionApiService.getSession().then(({data}) => {
+            SessionApiService.getSessions().then(({data}) => {
                 if(data.status){
                     this.sessions = data.data;
                 }

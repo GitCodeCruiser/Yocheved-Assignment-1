@@ -20,7 +20,7 @@
                         <td v-if="actions.length">
                             <div class="d-flex">
                                 <div v-for="(action, i) in actions" :key="i">
-                                    <CustomButton :clickHandler="() => handleAction(action, row.id)" :text="action.text" :buttonClass="'submit-button custom-button-blue mx-1'" />
+                                    <CustomButton v-if="typeof action.condition === 'function' && action.condition(row)" :clickHandler="() => handleAction(action, row.id)" :text="action.text" :buttonClass="'submit-button custom-button-blue mx-1'" />
                                 </div>
                             </div>
                         </td>

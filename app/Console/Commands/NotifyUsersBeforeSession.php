@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\User;
 use App\Models\Session;
+use App\Mail\SessionReminder;
 use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
@@ -23,17 +24,29 @@ class NotifyUsersBeforeSession extends Command
         $adminUser = User::first();
         $users[] = $adminUser->email;
 
-        $startDateTime = Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s');
+        $currentTime = Carbon::now();
+        $notificationTime = $currentTime->copy()->addMinutes(5);
 
-        $sessions = Session::where('start_date_time', '>=', $startDateTime)->where('end_date_time', '<=', now())->get();
-
+        $sessions = Session::where(function($query) use ($notificationTime) {
+            $query->where(function($query) use ($notificationTime) {
+                $query->where('is_daily', false)
+                ->whereBetween('start_date_time', [
+                    $notificationTime->format('Y-m-d H:i:00'),
+                    $notificationTime->format('Y-m-d H:i:59')
+                ]);
+            })
+            ->orWhere(function($query) use ($notificationTime) {
+                $query->where('is_daily', true)
+                      ->whereTime('start_date_time', $notificationTime->format('H:i:00'));
+            });
+        })->with(['students'])->get();
         foreach ($sessions as $session) {
-            $users[] = $session?->student?->email;
-            
+            foreach($session->students as $student){
+                $users[] = $student?->email;
+            }
+
             foreach ($users as $key => $user) {
-                Mail::send('emails.session_reminder', ['session' => $session], function ($message) use ($user) {
-                    $message->to($user->email)->subject('Reminder: Your session starts in 5 minutes');
-                });
+                Mail::to($user)->queue(new SessionReminder($session));
             }
         }
 
