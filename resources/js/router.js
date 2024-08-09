@@ -2,6 +2,8 @@ import Vue from "vue";
 import Router from "vue-router";
 import Auth from "./auth";
 import Login from "./pages/Login.vue";
+import GeneratePdf from "./pages/GeneratePdf.vue";
+import ImportDoc from "./pages/ImportDoc.vue";
 import Dashboard from "./pages/Dashboard.vue";
 import Students from "./pages/Students.vue";
 import AddStudent from "./pages/AddStudent.vue";
@@ -21,6 +23,8 @@ const ifAuthenticated = (to, from, next) => {
 };
 
 const routes = [
+    { path: "/generate-pdf", name: "GeneratePdf", component: GeneratePdf },
+    { path: "/import-doc", name: "ImportDoc", component: ImportDoc },
     { path: "/", name: "Login", component: Login },
     { path: "/dashboard", name: "Dashboard", component: Dashboard, beforeEnter: ifAuthenticated },
     { path: "/students", name: "Students", component: Students, beforeEnter: ifAuthenticated },
