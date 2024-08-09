@@ -1,4 +1,5 @@
-  <template>
+
+<template>
     <div>
       <div hidden ref="contentToExport">
         <h1>{{ title }}</h1>
