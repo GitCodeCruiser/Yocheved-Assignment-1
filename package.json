@@ -24,6 +24,8 @@
         "babel-preset-es2015": "^6.24.1",
         "bootstrap": "^5.3.3",
         "bootstrap-vue": "^2.23.1",
+        "html2pdf.js": "^0.10.2",
+        "mammoth": "^1.8.0",
         "mitt": "^3.0.1",
         "moment": "^2.30.1",
         "vee-validate": "^3.4.15",
