@@ -105,6 +105,12 @@ class SessionService
             throw new Exception("Please enter a valid session id", Response::HTTP_OK);
         }
 
+        $existingRating = SessionRating::where('session_id', $session->id)->first();
+        
+        if($existingRating){
+            throw new Exception("Rating already added.", Response::HTTP_OK);
+        }
+
         foreach($session->students as $student){
             SessionRating::create([
                 'session_id' => $session->id,

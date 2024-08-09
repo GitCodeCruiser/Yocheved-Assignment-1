@@ -45,7 +45,7 @@ export default {
             session: {
                 target: 0,
             },
-            obtained_marks: 0,
+            obtained_marks: null,
         }
     },
     mounted () {
