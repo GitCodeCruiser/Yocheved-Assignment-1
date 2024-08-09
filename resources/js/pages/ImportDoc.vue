@@ -1,11 +1,15 @@
 <template>
     <div>
       <input type="file" @change="handleFileUpload" />
-      <div v-if="parsedData">
+      <div v-if="parsedData && parsedData.length">
         <h3>Parsed Data</h3>
-        <p><strong>From Date:</strong> {{ parsedData.fromDate }}</p>
-        <p><strong>To Date:</strong> {{ parsedData.toDate }}</p>
-        <p><strong>Target:</strong> {{ parsedData.target }}</p>
+        <div v-for="(data, index) in parsedData" :key="index">
+          <p><strong>Entry {{ index + 1 }}</strong></p>
+          <p><strong>From Date:</strong> {{ data.fromDate }}</p>
+          <p><strong>To Date:</strong> {{ data.toDate }}</p>
+          <p><strong>Target:</strong> {{ data.target }}</p>
+          <hr />
+        </div>
       </div>
     </div>
   </template>
@@ -16,7 +20,7 @@
   export default {
     data() {
       return {
-        parsedData: null,
+        parsedData: [],
       };
     },
     methods: {
@@ -25,7 +29,7 @@
         if (file) {
           const arrayBuffer = await this.readFile(file);
           const text = await this.extractTextFromDocx(arrayBuffer);
-          this.parsedData = this.extractData(text);
+          this.parsedData = this.extractDataFromText(text);
         }
       },
       readFile(file) {
@@ -40,18 +44,42 @@
         const result = await mammoth.extractRawText({ arrayBuffer });
         return result.value;
       },
-      extractData(text) {
-        const fromDateMatch = text.match(/Session start date\s*(\d{4}-\d{2}-\d{2})/);
-        const toDateMatch = text.match(/Session end date\s*(\d{4}-\d{2}-\d{2})/);
-        const targetMatch = text.match(/Improvement target\s*(\d+)/);
+      extractDataFromText(text) {
+        const dataEntries = [];
   
-        return {
-          fromDate: fromDateMatch ? fromDateMatch[1] : 'Not found',
-          toDate: toDateMatch ? toDateMatch[1] : 'Not found',
-          target: targetMatch ? targetMatch[1] : 'Not found',
-        };
+        // Pattern for "Start From" and "End To" entries (Sample 2 - TKIP format)
+        const tkipPattern = /Start From\s*(\d{4}-\d{2}-\d{2})\s*End To\s*(\d{4}-\d{2}-\d{2})\s*Target\s*(\d+)/g;
+        let match;
+        while ((match = tkipPattern.exec(text)) !== null) {
+          dataEntries.push({
+            fromDate: match[1],
+            toDate: match[2],
+            target: match[3],
+          });
+        }
+  
+        // Pattern for "Session start date" and "Start Date" entries (Sample 1 format)
+        const sessionPattern = /(?:Session start date|Start Date)\s*(\d{4}-\d{2}-\d{2})\s*(?:Session end date|End Date)\s*(\d{4}-\d{2}-\d{2})\s*(?:Improvement target|target)\s*(\d+)/g;
+        while ((match = sessionPattern.exec(text)) !== null) {
+          dataEntries.push({
+            fromDate: match[1],
+            toDate: match[2],
+            target: match[3],
+          });
+        }
+  
+        // Pattern for "Date to Date" format in Sample 1
+        const dateRangePattern = /(\d{4}-\d{2}-\d{2})\s*to\s*(\d{4}-\d{2}-\d{2})\s*(\d+)\s*per\s*session/g;
+        while ((match = dateRangePattern.exec(text)) !== null) {
+          dataEntries.push({
+            fromDate: match[1],
+            toDate: match[2],
+            target: match[3],
+          });
+        }
+  
+        return dataEntries;
       },
     },
   };
   </script>
-  
