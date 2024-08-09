@@ -8,5 +8,8 @@ export default{
     addAvailability : (data) => axios.post(`${baseUrl}/availability/add`,data),
     getAvailability: (data) => axios.post(`${baseUrl}/availability/get`,data),
 
+    getStudentAvailabilityForSession: (data) => axios.post(`${baseUrl}/availability/student-for-session`,data),
+
+    
     addSchedule: (data) => axios.post(`${baseUrl}/schedule/add`,data)
 }

@@ -22,8 +22,9 @@ class AddStudentRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'email' => 'required|email|unique:students,email',
             'first_name' => 'required|string',
-            'middle_name' => 'required|string',
+            'middle_name' => 'string|nullable',
             'last_name' => 'required|string',
             'date_of_birth' => 'required|date'
         ];

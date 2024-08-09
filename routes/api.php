@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('availability')->group(function () {
         Route::post('add', [StudentController::class, 'addStudentAvailability']);
         Route::post('get', [StudentController::class, 'getStudentAvailability']);
+        Route::post('student-for-session', [StudentController::class, 'getAvailableStudents']);
     });
 
     Route::prefix('schedule')->group(function () {

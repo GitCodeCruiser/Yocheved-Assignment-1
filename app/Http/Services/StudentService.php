@@ -2,7 +2,9 @@
 namespace App\Http\Services;
 
 use Exception;
+use App\Models\Session;
 use App\Models\Student;
+use Illuminate\Support\Carbon;
 use App\Models\StudentAvailability;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -14,6 +16,7 @@ class StudentService{
 
     public function addStudent($request){
         $student = Student::create([
+            'email' => $request->email,
             'first_name' => $request->first_name,
             'middle_name' => $request->middle_name,
             'last_name' => $request->last_name,
@@ -52,7 +55,20 @@ class StudentService{
         return $studentAvailabilities;
     }
 
-    public function addStudentSchedule($request){
-       
+    public function getAvailableStudents($request){
+        $session = Session::where('id', $request->session_id)->first();
+        
+        if(!$session){
+            throw new Exception("Please enter a valid session id", Response::HTTP_OK);
+        }
+
+        $date = Carbon::parse('2024-08-09');
+        $day = $date->dayOfWeek;
+
+        $students = Student::withWhereHas('studentAvailability', function($query) use ($day){
+            $query->where('day', $day);
+        })->get();
+
+        return $students;
     }
 }

@@ -78,4 +78,16 @@ class StudentController extends Controller
             return $this->sendResponse($exception->getMessage(), $exception->getCode(), null, false);
         }
     }
+
+    public function getAvailableStudents(Request $request){
+        try 
+        {
+            $students = $this->studentService->getAvailableStudents($request);
+            return $this->sendResponse("Available students fetched successfully", Response::HTTP_OK, $students);
+        } 
+        catch (Exception $exception) 
+        {
+            return $this->sendResponse($exception->getMessage(), $exception->getCode(), null, false);
+        }
+    }
 }

@@ -36,6 +36,7 @@ export default {
     data() {
         return {
             headers: [
+                { label: 'Email', key: 'email' },
                 { label: 'Name', key: 'full_name' },
                 { label: 'Date of Birth', key: 'date_of_birth' },
             ],

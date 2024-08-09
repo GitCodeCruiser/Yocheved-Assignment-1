@@ -73,19 +73,20 @@ export default {
         }
     },
     created() {
-        this.getUserAvailabilities();
+        this.getAvailableUsers();
     },
 
     methods: {
         
-        getUserAvailabilities(){
-            let data = {student_id: this.$route.params.id}
+        getAvailableUsers(){
+            let data = {'session_id': this.$route.params.id};
 
-            StudentApiService.getAvailability(data).then(({data}) => {
+            StudentApiService.getStudentAvailabilityForSession(data).then(({data}) => {
                 if(data.status){
-                    this.availabilities = data.data;
+                    // this.availabilities = data.data;
+                    console.log(data.data);
                 }
-            })
+            });
         },
         
         getDay(day){

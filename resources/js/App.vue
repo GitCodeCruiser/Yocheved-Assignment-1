@@ -14,8 +14,8 @@
 
 <script>
 import Auth from './auth';
-import SideBar from './components/Sidebar.vue';
 import TopBar from './components/TopBar.vue';
+import SideBar from './components/SideBar.vue';
 
 export default {
     components: {
