@@ -3,14 +3,13 @@
         <div class="d-flex justify-content-end">
             <CustomButton type="button" :clickHandler="showAddStudentForm" text="Add student" :buttonClass="'submit-button custom-button-blue mb-2'" :disabled="isDisabled" />
         </div>
-        <template v-if="students&& students.length">
+        <template v-if="students && (students.length == 0 || students.length > 0)">
             <CustomTable
                 :headers="headers"
                 :data="students"
                 :showActions="true"
                 :actions="[
                     { text: 'Availabilities', handler: handleAction, key: 'availability' },
-                    { text: 'Schedule', handler: handleAction , key: 'schedule'},
                 ]"
                 @action="handleAction"
             />
@@ -70,9 +69,7 @@ export default {
             if(data.action.key == "availability"){
                 this.$router.push({ name: 'AddAvailability', params: { id: data.data } });
             }
-            else if(data.action.key == 'schedule'){
-                this.$router.push({ name: 'AddSchedule', params: { id: data.data } });
-            }
+            
         }
     },
 }

@@ -8,6 +8,9 @@
             <li>
                 <router-link :to="{ name: 'Students' }">Students</router-link>
             </li>
+            <li>
+                <router-link :to="{ name: 'Sessions' }">Sessions</router-link>
+            </li>
         </ul>
     </nav>
 </template>

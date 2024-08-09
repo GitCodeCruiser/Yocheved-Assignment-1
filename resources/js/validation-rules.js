@@ -38,3 +38,11 @@ extend("name", {
     },
     message: "Name must be 2-50 characters long and can only contain letters and spaces",
 });
+
+
+extend("integer", {
+    validate(value) {
+        return /^[0-9]+$/.test(value);
+    },
+    message: "The value must be a valid integer.",
+});

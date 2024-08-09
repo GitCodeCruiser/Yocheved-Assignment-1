@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SessionController;
 use App\Http\Controllers\StudentController;
 
 /*
@@ -32,5 +33,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('schedule')->group(function () {
         Route::post('add', [StudentController::class, 'addStudentSchedule']);
         Route::post('get', [StudentController::class, 'getStudentAvailability']);
+    });
+
+    Route::prefix('session')->group(function () {
+        Route::post('add', [SessionController::class, 'addSession']);
+        Route::get('get', [SessionController::class, 'getSession']);
     });
 });

@@ -60,6 +60,7 @@ export default {
                 .then(({ data }) => {
                     if (data.status) {
                         this.$toast.success(data.message);
+                        this.$router.push({name: 'Students'});
                     } else {
                         this.$toast.error(data.message);
                     }
