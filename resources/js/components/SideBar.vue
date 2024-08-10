@@ -14,6 +14,9 @@
             <li>
                 <router-link :to="{ name: 'ImportDoc' }">Import Session</router-link>
             </li>
+            <li>
+                <router-link :to="{ name: 'AddReport' }">Report Template</router-link>
+            </li>
         </ul>
     </nav>
 </template>

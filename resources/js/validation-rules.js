@@ -56,3 +56,10 @@ extend("max", {
     params: ['max'],
     message: "The value must be a valid integer and less than or equal to {max}.",
 });
+
+extend('nullableString', {
+    validate(value) {
+        return value === null || typeof value === 'string';
+    },
+    message: 'The value must be a string or null.',
+});

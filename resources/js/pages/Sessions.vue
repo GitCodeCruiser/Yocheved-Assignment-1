@@ -21,6 +21,7 @@
 import CustomButton from '../components/CustomButton.vue';
 import CustomTable from '../components/CustomTable.vue';
 import SessionApiService from '../api-services/session-api-service';
+import ReportApiService from '../api-services/report-api-service';
 
 export default {
     components: {
@@ -40,7 +41,8 @@ export default {
             ],
             actions: [
                 { text: 'Create Schedule', handler: this.handleAction, key: 'assignStudent', condition: (row) => true },
-                { text: 'Rate', key: 'rateSession', condition: (row) => row.status_column === 'completed', handler: this.handleAction }
+                { text: 'Rate', key: 'rateSession', condition: (row) => row.status_column === 'completed', handler: this.handleAction },
+                { text: 'Report', key: 'generate_report', condition: (row) => row.status_column === 'completed', handler: this.handleAction }
             ]
         }
     },
@@ -60,6 +62,9 @@ export default {
             } else if (data.action.key === "rateSession") {
                 this.$router.push({ name: 'AddRating', params: { id: data.data } });
             }
+            else if(data.action.key == "generate_report"){
+                this.downloadPDF(data.data)
+            }
         },
 
         getSessions(page = 1) {
@@ -75,6 +80,20 @@ export default {
 
         paginate(page) {
             this.getSessions(page);
+        },
+
+        downloadPDF(id) {
+            let data = {session_id: id}
+            ReportApiService.printReport(data).then(response => {
+                const blob = new Blob([response.data], { type: 'application/pdf' });
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = 'report.pdf';
+                link.click();
+            })
+            .catch(error => {
+                console.error('There was an error generating the PDF:', error);
+            });
         }
     }
 }

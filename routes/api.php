@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\StudentController;
 
@@ -45,5 +46,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('add-multiple', [SessionController::class, 'addMultipleSessions']);
         
+    });
+
+
+    Route::prefix('report')->group(function () {
+        Route::post('add', [ReportController::class, 'addReport']);
+        Route::post('get', [ReportController::class, 'getReport']);
+        Route::post('generate-pdf', [ReportController::class, 'generatePDF']);
     });
 });

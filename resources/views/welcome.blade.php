@@ -6,6 +6,7 @@
     <title>Student Tracker</title>
     <link rel="stylesheet" href="{{ mix('css/custom.css') }}">
     <link rel="stylesheet" href="{{ mix('css/app.css') }}">
+    <link rel="stylesheet" href="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.css">
 </head>
 <body>
     <div id="app">

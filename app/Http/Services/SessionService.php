@@ -127,12 +127,14 @@ class SessionService
         $addedSessions = [];
 
         foreach($sessions as $session){
-            $addedSessions[] = Session::create([
-                'start_date_time' => Carbon::parse($session['fromDate'])->format('Y-m-d H:i:s'),
-                'end_date_time' => Carbon::parse($session['toDate'])->format('Y-m-d H:i:s'),
-                'target' => $session['target'],
-                'is_daily' => false,
-            ]);
+            if(isset($session['fromDate']) && isset($session['toDate'])){
+                $addedSessions[] = Session::create([
+                    'start_date_time' => Carbon::parse($session['fromDate'])->format('Y-m-d H:i:s'),
+                    'end_date_time' => Carbon::parse($session['toDate'])->format('Y-m-d H:i:s'),
+                    'target' => $session['target'],
+                    'is_daily' => false,
+                ]);
+            }
         }
 
         return $addedSessions;
