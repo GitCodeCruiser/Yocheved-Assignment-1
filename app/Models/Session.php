@@ -26,4 +26,8 @@ class Session extends Model
     {
         return $this->attributes['is_daily'] == 1 ? 'Yes' : 'No';
     }
+
+    public function rating(){
+        return $this->hasOne(SessionRating::class, 'session_id', 'id')->latestOfMany();
+    }
 }

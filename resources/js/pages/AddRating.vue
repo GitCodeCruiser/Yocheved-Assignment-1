@@ -9,18 +9,15 @@
             </div>
             <ValidationObserver v-slot="{ invalid }">
                 <form @submit.prevent="addRating">
-                    <!-- Email Field -->
-                    <ValidationProvider name="obtained_marks" rules="required" v-slot="{ errors }">
+                    <ValidationProvider name="obtained_marks" :rules="`required|integer|max:${session.target}`" v-slot="{ errors }">
                         <div class="mb-2">
-                            <CustomInput id="obt_marks" v-model="obtained_marks" type="text" placeholder="Enter Rating"
-                                label="Rating" />
+                            <CustomInput id="obt_marks" v-model="obtained_marks" type="text" placeholder="Enter Rating" label="Rating" />
                             <span class="text-danger">{{ errors[0] }}</span>
                         </div>
                     </ValidationProvider>
 
-                    <!-- Submit Button -->
                     <div class="d-flex justify-content-center mt-3">
-                        <CustomButton type="submit" text="Login"
+                        <CustomButton type="submit" text="Add Rating"
                             :buttonClass="'submit-button custom-button-blue w-100'" :disabled="invalid" />
                     </div>
                 </form>
@@ -58,6 +55,9 @@ export default {
                 if(data.status)
                 {
                     this.session = data.data;
+                    if(data?.data?.rating){
+                        this.obtained_marks = String(data.data.rating.obtained_rating);
+                    }
                 }
                 else
                 {

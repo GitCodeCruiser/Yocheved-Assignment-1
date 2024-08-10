@@ -75,4 +75,14 @@ class SessionController extends Controller
             return $this->sendResponse($exception->getMessage(), $exception->getCode(), null, false);
         }
     }
+    public function addMultipleSessions(Request $request){
+        try 
+        {
+            $session = $this->sessionService->addMultipleSessions($request);
+            return $this->sendResponse("Session fetched successfully", Response::HTTP_OK, $session);
+        } 
+        catch (Exception $exception) {
+            return $this->sendResponse($exception->getMessage(), $exception->getCode(), null, false);
+        }
+    }
 }

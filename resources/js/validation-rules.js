@@ -46,3 +46,13 @@ extend("integer", {
     },
     message: "The value must be a valid integer.",
 });
+
+extend("max", {
+    validate(value, { max }) {
+        const isInteger = /^[0-9]+$/.test(value);
+        const isLessThanMax = parseInt(value, 10) <= max;
+        return isInteger && isLessThanMax;
+    },
+    params: ['max'],
+    message: "The value must be a valid integer and less than or equal to {max}.",
+});

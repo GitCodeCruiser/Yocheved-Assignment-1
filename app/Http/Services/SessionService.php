@@ -59,13 +59,13 @@ class SessionService
 
     public function getSessions()
     {
-        $sessions = Session::all();
+        $sessions = Session::paginate(10);
         return $sessions;
     }
 
     public function getSession($request)
     {
-        $session = Session::where('id', $request->session_id)->first();
+        $session = Session::with('rating')->where('id', $request->session_id)->first();
         return $session;
     }
 
@@ -105,14 +105,13 @@ class SessionService
             throw new Exception("Please enter a valid session id", Response::HTTP_OK);
         }
 
-        $existingRating = SessionRating::where('session_id', $session->id)->first();
-        
-        if($existingRating){
-            throw new Exception("Rating already added.", Response::HTTP_OK);
-        }
-
         foreach($session->students as $student){
-            SessionRating::create([
+            SessionRating::updateOrCreate(
+                [
+                    'session_id' => $session->id,
+                    'student_id' => $student->id,
+                ],
+                [
                 'session_id' => $session->id,
                 'student_id' => $student->id,
                 'total_rating' => $session->target,
@@ -121,5 +120,21 @@ class SessionService
         }
 
         return SessionRating::where('session_id', $session->id)->get();
+    }
+
+    public function addMultipleSessions($request){
+        $sessions = $request->all();
+        $addedSessions = [];
+
+        foreach($sessions as $session){
+            $addedSessions[] = Session::create([
+                'start_date_time' => Carbon::parse($session['fromDate'])->format('Y-m-d H:i:s'),
+                'end_date_time' => Carbon::parse($session['toDate'])->format('Y-m-d H:i:s'),
+                'target' => $session['target'],
+                'is_daily' => false,
+            ]);
+        }
+
+        return $addedSessions;
     }
 }

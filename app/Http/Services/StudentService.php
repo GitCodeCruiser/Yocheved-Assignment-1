@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class StudentService{
     public function getStudents(){
-        $students = Student::get();
+        $students = Student::paginate(10);
         return $students;
     }
 

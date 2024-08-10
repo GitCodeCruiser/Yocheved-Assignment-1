@@ -1,17 +1,22 @@
 <template>
     <div>
         <div class="d-flex justify-content-end">
-            <CustomButton type="button" :clickHandler="showAddStudentForm" text="Add student" :buttonClass="'submit-button custom-button-blue mb-2'" :disabled="isDisabled" />
+            <CustomButton
+                type="button"
+                :clickHandler="showAddStudentForm"
+                text="Add student"
+                :buttonClass="'submit-button custom-button-blue mb-2'"
+                :disabled="isDisabled"
+            />
         </div>
-        <template v-if="students && (students.length == 0 || students.length > 0)">
+        <template v-if="students && students.data.length > 0">
             <CustomTable
                 :headers="headers"
-                :data="students"
-                :showActions="true"
-                :actions="[
-                    { text: 'Availabilities', handler: handleAction, key: 'availability' },
-                ]"
+                :data="students.data"
+                :actions="actions"
+                :pagination="students"
                 @action="handleAction"
+                @paginate="paginate"
             />
         </template>
         <div v-else class="text-center">Loading...</div>
@@ -29,7 +34,7 @@ export default {
         CustomButton
     },
 
-    mounted(){
+    mounted() {
         this.getStudents();
     },
 
@@ -40,40 +45,44 @@ export default {
                 { label: 'Name', key: 'full_name' },
                 { label: 'Date of Birth', key: 'date_of_birth' },
             ],
-            students: [
-
-            ],
-
+            students: null,
             isDisabled: false,
+            actions: [
+                { text: 'Availabilities', handler: this.handleAction, key: 'availability', condition: (row) => true },
+            ],
         }
     },
 
     methods: {
         showAddStudentForm() {
-            this.$router.push({name: 'AddStudent'});
-        },
-
-        getStudents() {
-            StudentApiService.getStudents().then(({data}) => {
-                if(data.status)
-                {
-                    this.students = data.data;
-                }
-                else
-                {
-                    this.$toast.error(data.message);
-                }
-            })
+            this.$router.push({ name: 'AddStudent' });
         },
 
         handleAction(data) {
-            if(data.action.key == "availability"){
+            if (data.action.key === "availability") {
                 this.$router.push({ name: 'AddAvailability', params: { id: data.data } });
             }
-            
+        },
+
+        getStudents(page = 1) {
+            StudentApiService.getStudents({ params: { page } })
+                .then(({ data }) => {
+                    if (data.status) {
+                        this.students = data.data;
+                    } else {
+                        this.$toast.error(data.message);
+                    }
+                });
+        },
+
+        paginate(page) {
+            this.getStudents(page);
         }
+
+       
     },
 }
 </script>
+
 
 <style lang="scss" scoped></style>

@@ -208,3 +208,20 @@ a.article:hover {
         display: none;
     }
 }
+
+.page-link {
+    color: var(--dark-blue) !important; /* Custom color for text */
+}
+
+/* Change the background color and border color of pagination links */
+.page-link:hover {
+    background-color: var(--dark-blue); /* Background color on hover */
+    color: white; /* Text color on hover */
+}
+
+/* Change the color of the active pagination link */
+.page-item.active .page-link {
+    background-color: var(--dark-blue); /* Active background color */
+    border-color: var(--dark-blue); /* Active border color */
+    color: white !important; /* Active text color */
+}

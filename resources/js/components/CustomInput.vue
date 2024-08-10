@@ -24,12 +24,21 @@ export default {
         disabled: {
             type: Boolean,
             default: false
-        }
+        },
+        value: {
+            type: String,
+            default: "",
+        },
     },
     data() {
         return {
             inputValue: "",
         };
+    },
+    watch: {
+        value(newValue) {
+            this.inputValue = newValue;
+        },
     },
     methods: {
         handleInput(event) {

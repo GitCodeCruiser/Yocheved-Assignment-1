@@ -3,13 +3,14 @@
         <div class="d-flex justify-content-end">
             <CustomButton type="button" :clickHandler="showAddSessionForm" text="Add Session" :buttonClass="'submit-button custom-button-blue mb-2'" :disabled="isDisabled" />
         </div>
-        <template v-if="sessions && (sessions.length == 0 || sessions.length > 0)">
+        <template v-if="sessions && sessions.data.length > 0">
             <CustomTable
                 :headers="headers"
-                :data="sessions"
-                :showActions="true"
+                :data="sessions.data"
                 :actions="actions"
+                :pagination="sessions"
                 @action="handleAction"
+                @paginate="paginate"
             />
         </template>
         <div v-else class="text-center">Loading...</div>
@@ -29,7 +30,7 @@ export default {
     data() {
         return {
             isDisabled: false,
-            sessions: [],
+            sessions: null,
             headers: [
                 { label: 'Start Date Time', key: 'start_date_time' },
                 { label: 'End Date Time', key: 'end_date_time' },
@@ -37,51 +38,47 @@ export default {
                 { label: 'Daily', key: 'daily' },
                 { label: 'Status', key: 'status_column' },
             ],
-            
             actions: [
-                { text: 'Create Schedule', handler: this.handleAction, key: 'assignStudent',  condition: (row) => true },
-                {
-                    text: 'Rate',
-                    key: 'rateSession',
-                    condition: (row) => row.status_column === 'completed',
-                    handler: this.handleAction
-                }
+                { text: 'Create Schedule', handler: this.handleAction, key: 'assignStudent', condition: (row) => true },
+                { text: 'Rate', key: 'rateSession', condition: (row) => row.status_column === 'completed', handler: this.handleAction }
             ]
         }
     },
-    
-    mounted(){
+
+    mounted() {
         this.getSessions();
     },
 
     methods: {
         showAddSessionForm() {
-            this.$router.push({name: 'AddSession'});
+            this.$router.push({ name: 'AddSession' });
         },
 
         handleAction(data) {
-            if(data.action.key == "assignStudent"){
+            if (data.action.key === "assignStudent") {
                 this.$router.push({ name: 'AddSchedule', params: { id: data.data } });
-            }
-            else if(data.action.key == "rateSession"){
+            } else if (data.action.key === "rateSession") {
                 this.$router.push({ name: 'AddRating', params: { id: data.data } });
             }
         },
 
-        getSessions(){
-            SessionApiService.getSessions().then(({data}) => {
-                if(data.status){
-                    this.sessions = data.data;
-                }
-                else{
-                    this.$toast.error(data.message);
-                }
-            })
+        getSessions(page = 1) {
+            SessionApiService.getSessions({ params: { page } })
+                .then(({ data }) => {
+                    if (data.status) {
+                        this.sessions = data.data;
+                    } else {
+                        this.$toast.error(data.message);
+                    }
+                });
+        },
+
+        paginate(page) {
+            this.getSessions(page);
         }
-    },
+    }
 }
 </script>
 
 <style lang="scss" scoped>
-
 </style>

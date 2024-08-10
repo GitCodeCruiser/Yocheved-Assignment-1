@@ -42,6 +42,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('get', [SessionController::class, 'getSessions']);
         Route::post('get-session', [SessionController::class, 'getSession']);
         Route::post('add-rating', [SessionController::class, 'addSessionRating']);
+
+        Route::post('add-multiple', [SessionController::class, 'addMultipleSessions']);
         
     });
 });
