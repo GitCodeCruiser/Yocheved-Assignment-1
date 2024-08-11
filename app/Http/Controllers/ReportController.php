@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Services\ReportService;
 
+use function PHPUnit\Framework\isEmpty;
+
 class ReportController extends Controller
 {
     private $reportService;
@@ -139,10 +141,16 @@ class ReportController extends Controller
                 ];
                 
                 // Replacing placeholders with their respective values
-                $updatedHtml .= str_replace($placeholders, $replacements, $html);
+                if(isset($session->rating)){
+                    $updatedHtml .= str_replace($placeholders, $replacements, $html);
+                }
             }
         }
- 
+
+        if (empty($updatedHtml)) {
+            return $this->sendResponse("No session with rating found", Response::HTTP_OK, null, false);
+        }
+
         $updatedHtml = mb_convert_encoding($updatedHtml, 'UTF-8', 'auto');
         $pdf = PDF::loadHTML($updatedHtml);
         $title = $report->title . ".pdf";

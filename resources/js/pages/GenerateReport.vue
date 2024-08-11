@@ -141,16 +141,20 @@ export default {
         },
 
         downloadPDF() {
-            ReportApiService.printReport(this.data).then(response => {
-                const blob = new Blob([response.data], { type: 'application/pdf' });
-                const link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = 'report.pdf';
-                link.click();
+            ReportApiService.printReport(this.data).then((response) => {
+                const contentType = response.headers['content-type'];
+
+                if (contentType === 'application/json') {
+                    this.$toast.error("No session with rating found");
+                }
+                else{
+                    const blob = new Blob([response.data], { type: 'application/pdf' });
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = 'report.pdf';
+                    link.click();
+                }
             })
-                .catch(error => {
-                    console.error('There was an error generating the PDF:', error);
-                });
         }
     },
 }
