@@ -134,7 +134,7 @@ class ReportController extends Controller
                     $startTime->format('H:i:s'),
                     $endTime->format('H:i:s'),
                     $session->rating->obtained_rating ?? 'N/A',
-                    $session->rating->total_rating,
+                    $session->rating->total_rating ?? 'N/A',
                     $session->target ?? 'N/A', // Placeholder for @target
                 ];
                 
