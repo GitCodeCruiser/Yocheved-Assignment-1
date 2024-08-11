@@ -63,3 +63,30 @@ extend('nullableString', {
     },
     message: 'The value must be a string or null.',
 });
+
+extend("time", {
+    validate(value) {
+        // Check if the time is in the format HH:MM
+        return /^\d{2}:\d{2}$/.test(value) && isValidTime(value);
+    },
+    message: "The time must be in HH:MM format and must be a valid time",
+});
+
+function isValidTime(value) {
+    const [hours, minutes] = value.split(':').map(Number);
+    return hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60;
+}
+
+extend('notPastDate', {
+    validate(value) {
+        const today = new Date();
+        const inputDate = new Date(value);
+
+        // Normalize time for comparison
+        today.setHours(0, 0, 0, 0);
+        inputDate.setHours(0, 0, 0, 0);
+
+        return inputDate >= today;
+    },
+    message: 'The date must not be in the past.',
+});

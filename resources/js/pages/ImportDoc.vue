@@ -6,7 +6,7 @@
         <input type="file" @change="handleFileSelection" class="form-control mt-2" />
       </div>
       <div class="d-flex justify-content-end mt-3">
-        <CustomButton type="button" :clickHandler="handleFileUpload" text="Upload File" :buttonClass="'submit-button custom-button-blue'" :disabled="isDisabled" />
+        <CustomButton type="button" :clickHandler="handleFileUpload" text="Upload File" :buttonClass="'submit-button custom-button-blue'" :disabled="false" />
       </div>
     </div>
   </div>

@@ -13,14 +13,15 @@ class SessionReminder extends Mailable
 {
     use Queueable, SerializesModels;
     public $session;
-
+    public $admin;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($session)
+    public function __construct($admin, $session)
     {
         $this->session = $session;
+        $this->admin = $admin;
     }
 
     /**
@@ -39,7 +40,11 @@ class SessionReminder extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.session_reminder',
+            view: 'emails.session_reminder',
+            with: [
+                'student' => $this->session,
+                'admin' => $this->admin
+            ]
         );
     }
 

@@ -16,6 +16,11 @@ class StudentService{
         return $students;
     }
 
+    public function allStudents(){
+        $students = Student::get();
+        return $students;
+    }
+
     public function addStudent($request){
         $student = Student::create([
             'email' => $request->email,
@@ -29,8 +34,8 @@ class StudentService{
     }
 
     public function addStudentAvailability($request){
-        $student = Student::where('id', $request->student_id)->exists();
-
+        $student = Student::where('slug', $request->student_id)->first();
+        
         if(!$student){
             throw new Exception("Please enter a valid student id", Response::HTTP_OK);
         }
@@ -38,22 +43,22 @@ class StudentService{
 
         foreach($request->days as $day){
             StudentAvailability::create([
-                'student_id' => $request->student_id,
+                'student_id' => $student->id,
                 'day' => $day
             ]);
         }
 
-        $studentAvailabilities = Student::where('id', $request->student_id)->with("studentAvailability")->first();
+        $studentAvailabilities = Student::where('id', $student->id)->with("studentAvailability")->first();
         return $studentAvailabilities;
     }
 
     public function getStudentAvailability($request){
-        $student = Student::where('id', $request->student_id)->exists();
+        $student = Student::where('slug', $request->student_id)->first();
         if(!$student){
             throw new Exception("Please enter a valid student id", Response::HTTP_OK);
         }
 
-        $studentAvailabilities = Student::where('id', $request->student_id)->with("studentAvailability")->first();
+        $studentAvailabilities = Student::where('id', $student->id)->with("studentAvailability")->first();
         return $studentAvailabilities;
     }
 

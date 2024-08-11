@@ -12,7 +12,6 @@ use Illuminate\Queue\SerializesModels;
 class RateStudent extends Mailable
 {
     use Queueable, SerializesModels;
-
     public $student;
     public $admin;
 

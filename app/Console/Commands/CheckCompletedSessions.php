@@ -32,10 +32,11 @@ class CheckCompletedSessions extends Command
         $now = now();
         $adminUser = User::first();
         
-        $sessions = Session::where('end_date_time', '<', $now)
-                            ->where('status', 0)
-                            ->with(['students'])
-                            ->get();
+        $sessions = Session::where('start_date', $now->format('Y-m-d'))
+        ->where('end_time', '<', $now->format('H:i:s'))
+        ->where('status', 0)
+        ->with(['students'])
+        ->get();
 
         foreach ($sessions as $session) {
             $session->status = 1;

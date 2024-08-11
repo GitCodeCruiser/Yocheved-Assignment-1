@@ -1,7 +1,12 @@
 <?php
 namespace App\Http\Services;
 
+use Exception;
+use Carbon\Carbon;
 use App\Models\Report;
+use App\Models\Session;
+    use Barryvdh\DomPDF\Facade\Pdf; 
+use Symfony\Component\HttpFoundation\Response;
 
 class ReportService{
     public function addReport($request){

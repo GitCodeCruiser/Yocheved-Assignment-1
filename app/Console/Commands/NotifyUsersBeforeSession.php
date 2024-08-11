@@ -24,29 +24,29 @@ class NotifyUsersBeforeSession extends Command
         $adminUser = User::first();
         $users[] = $adminUser->email;
 
-        $currentTime = Carbon::now();
-        $notificationTime = $currentTime->copy()->addMinutes(5);
+        $eventStartTime = Carbon::now()->addMinute(5)->format("H:i:s");
 
-        $sessions = Session::where(function($query) use ($notificationTime) {
-            $query->where(function($query) use ($notificationTime) {
-                $query->where('is_daily', false)
-                ->whereBetween('start_date_time', [
-                    $notificationTime->format('Y-m-d H:i:00'),
-                    $notificationTime->format('Y-m-d H:i:59')
-                ]);
+        $sessions = Session::where(function($query) use ($eventStartTime) {
+            $query->where(function($query) use ($eventStartTime) {
+                $query->where('is_daily', false)->where('start_time', '<=', $eventStartTime);
             })
-            ->orWhere(function($query) use ($notificationTime) {
-                $query->where('is_daily', true)
-                      ->whereTime('start_date_time', $notificationTime->format('H:i:00'));
+            ->orWhere(function($query) use ($eventStartTime) {
+                $query->where('is_daily', true)->where('start_time', '<=', $eventStartTime);
             });
-        })->with(['students'])->get();
+        })->whereNull('notified_at')->with(['students'])->get();
+
         foreach ($sessions as $session) {
-            foreach($session->students as $student){
+            
+            $session->update([
+                'notified_at' => now(),
+            ]);
+
+            foreach ($session->students as $student) {
                 $users[] = $student?->email;
             }
 
-            foreach ($users as $key => $user) {
-                Mail::to($user)->queue(new SessionReminder($session));
+            foreach ($users as $user) {
+                Mail::to($user)->queue(new SessionReminder($adminUser, $session));
             }
         }
 

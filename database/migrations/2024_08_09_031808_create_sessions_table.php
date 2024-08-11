@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('sessions', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('start_date_time');
-            $table->dateTime('end_date_time');
+            $table->date('start_date');
+            $table->time('start_time');
+            $table->time('end_time');
             $table->boolean('is_daily');
             $table->integer('target');
             $table->timestamps();

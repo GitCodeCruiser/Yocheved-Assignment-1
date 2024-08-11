@@ -22,7 +22,7 @@ class AddAvailabilityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'student_id' => 'required|integer|exists:students,id',
+            'student_id' => 'required|exists:students,slug',
             'days' => 'required|array|min:1',
             'days.*' => 'integer|between:0,6',
         ];

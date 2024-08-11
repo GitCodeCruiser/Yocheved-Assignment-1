@@ -13,14 +13,15 @@ import Sessions from "./pages/Sessions.vue";
 import AddSession from "./pages/AddSession.vue";
 import AddRating from "./pages/AddRating.vue";
 import CreateReport from "./pages/CreateReport.vue";
+import GenerateReport from "./pages/GenerateReport.vue";
 
 Vue.use(Router);
 
 const ifAuthenticated = (to, from, next) => {
     if (Auth.check()) {
-        next(); // Proceed with navigation
+        next();
     } else {
-        next({ name: "Login" }); // Redirect to Login if not authenticated
+        next({ name: "Login" });
     }
 };
 
@@ -37,6 +38,7 @@ const routes = [
     { path: "/add-schedule/:id", name: "AddSchedule", component: AddSchedule, beforeEnter: ifAuthenticated },
     { path: "/add-rating/:id", name: "AddRating", component: AddRating, beforeEnter: ifAuthenticated },
     { path: "/add-report", name: "AddReport", component: CreateReport, beforeEnter: ifAuthenticated },
+    { path: "/generate-report", name: "GenerateReport", component: GenerateReport, beforeEnter: ifAuthenticated },
 ];
 
 const router = new Router({

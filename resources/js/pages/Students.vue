@@ -19,7 +19,7 @@
                 @paginate="paginate"
             />
         </template>
-        <div v-else class="text-center">Loading...</div>
+        <div v-else class="text-center">No Records Found</div>
     </div>
 </template>
 
@@ -47,6 +47,7 @@ export default {
             ],
             students: null,
             isDisabled: false,
+            logs: null,
             actions: [
                 { text: 'Availabilities', handler: this.handleAction, key: 'availability', condition: (row) => true },
             ],
@@ -60,7 +61,7 @@ export default {
 
         handleAction(data) {
             if (data.action.key === "availability") {
-                this.$router.push({ name: 'AddAvailability', params: { id: data.data } });
+                this.$router.push({ name: 'AddAvailability', params: { id: data.data.slug } });
             }
         },
 

@@ -16,6 +16,8 @@ return new class extends Migration
                 0 => pending,
                 1 => completed
             ");
+
+            $table->dateTime('notified_at')->nullable();
         });
     }
 
@@ -26,6 +28,7 @@ return new class extends Migration
     {
         Schema::table('sessions', function (Blueprint $table) {
             $table->dropColumn('status');
+            $table->dropColumn('notified_at');
         });
     }
 };

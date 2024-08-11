@@ -13,7 +13,7 @@
                 @paginate="paginate"
             />
         </template>
-        <div v-else class="text-center">Loading...</div>
+        <div v-else class="text-center">No Records Found</div>
     </div>
 </template>
 
@@ -33,16 +33,17 @@ export default {
             isDisabled: false,
             sessions: null,
             headers: [
-                { label: 'Start Date Time', key: 'start_date_time' },
-                { label: 'End Date Time', key: 'end_date_time' },
+                { label: 'Start Date', key: 'start_date' },
+                { label: 'Start Time', key: 'start_time' },
+                { label: 'End Time', key: 'end_time' },
                 { label: 'Target', key: 'target' },
                 { label: 'Daily', key: 'daily' },
                 { label: 'Status', key: 'status_column' },
             ],
             actions: [
                 { text: 'Create Schedule', handler: this.handleAction, key: 'assignStudent', condition: (row) => true },
-                { text: 'Rate', key: 'rateSession', condition: (row) => row.status_column === 'completed', handler: this.handleAction },
-                { text: 'Report', key: 'generate_report', condition: (row) => row.status_column === 'completed', handler: this.handleAction }
+                { text: 'Rate', key: 'rateSession', condition: (row) => row.status_column === 'completed', handler: this.handleAction }
+                // { text: 'Report', key: 'generate_report', condition: (row) => row.status_column === 'completed', handler: this.handleAction }
             ]
         }
     },
@@ -58,9 +59,9 @@ export default {
 
         handleAction(data) {
             if (data.action.key === "assignStudent") {
-                this.$router.push({ name: 'AddSchedule', params: { id: data.data } });
+                this.$router.push({ name: 'AddSchedule', params: { id: data.data.id } });
             } else if (data.action.key === "rateSession") {
-                this.$router.push({ name: 'AddRating', params: { id: data.data } });
+                this.$router.push({ name: 'AddRating', params: { id: data.data.id } });
             }
             else if(data.action.key == "generate_report"){
                 this.downloadPDF(data.data)

@@ -9,7 +9,7 @@ class Session extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['start_date_time', 'end_date_time', 'target', 'is_daily', 'status'];
+    protected $fillable = ['start_date', 'start_time', 'end_time', 'target', 'is_daily', 'status', 'notified_at'];
     protected $appends = ['status_column', 'daily'];
 
     public function students()

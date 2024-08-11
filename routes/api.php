@@ -24,6 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('student')->group(function () {
         Route::get('get', [StudentController::class, 'getStudents']);
         Route::post('add', [StudentController::class, 'addStudent']);
+        Route::post('all', [StudentController::class, 'allStudents']);
     });
 
     Route::prefix('availability')->group(function () {
@@ -48,10 +49,9 @@ Route::middleware('auth:sanctum')->group(function () {
         
     });
 
-
     Route::prefix('report')->group(function () {
         Route::post('add', [ReportController::class, 'addReport']);
         Route::post('get', [ReportController::class, 'getReport']);
-        Route::post('generate-pdf', [ReportController::class, 'generatePDF']);
+        Route::post('generate-report', [ReportController::class, 'generateReport']);
     });
 });

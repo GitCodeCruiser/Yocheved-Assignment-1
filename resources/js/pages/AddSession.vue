@@ -5,19 +5,27 @@
             <ValidationObserver v-slot="{ invalid }">
                 <form @submit.prevent="addSession">
                     <div class="form-group">
-                        <label for="start_time">Start Time</label>
-                        <ValidationProvider name="Start Time" rules="required" v-slot="{ errors }">
-                            <input v-model="data.start_date_time" type="datetime-local" class="form-control mt-2"
-                                id="start_time">
+                        <label for="start_time">Start Date</label>
+                        <ValidationProvider name="Start Time" rules="required|notPastDate" v-slot="{ errors }">
+                            <input v-model="data.start_date" type="date" class="form-control mt-2"
+                                id="start_time" :min="minDate">
                             <span class="text-danger">{{ errors[0] }}</span>
                         </ValidationProvider>
                     </div>
 
-                    <!-- End Time -->
+                    <div class="form-group">
+                        <label for="end_time">Start Time</label>
+                        <ValidationProvider name="End Time" rules="required" v-slot="{ errors }">
+                            <input v-model="data.start_time" type="time" class="form-control mt-2"
+                                id="end_time">
+                            <span class="text-danger">{{ errors[0] }}</span>
+                        </ValidationProvider>
+                    </div>
+
                     <div class="form-group">
                         <label for="end_time">End Time</label>
                         <ValidationProvider name="End Time" rules="required" v-slot="{ errors }">
-                            <input v-model="data.end_date_time" type="datetime-local" class="form-control mt-2"
+                            <input v-model="data.end_time" type="time" class="form-control mt-2"
                                 id="end_time">
                             <span class="text-danger">{{ errors[0] }}</span>
                         </ValidationProvider>
@@ -34,7 +42,7 @@
                     </div>
 
                     <div class="form-group form-check">
-                        <ValidationProvider name="IsFaily" rules="" v-slot="{ errors }">
+                        <ValidationProvider name="isDaily" rules="" v-slot="{ errors }">
                             <input class="form-check-input" v-model="data.is_daily" type="checkbox" id="is_daily">
                             <span class="text-danger">{{ errors[0] }}</span>
                         </ValidationProvider>
@@ -63,10 +71,18 @@ export default {
         return {
             data: {
                 is_daily: false,
-                start_date_time: "",
-                end_date_time: "",
+                start_date: "",
+                start_time: "",
+                end_time: "",
                 target: 10,
             },
+        }
+    },
+
+    computed: {
+        minDate() {
+        // Format the current date as YYYY-MM-DD
+        return new Date().toISOString().split('T')[0];
         }
     },
 

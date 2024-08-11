@@ -17,6 +17,9 @@
             <li>
                 <router-link :to="{ name: 'AddReport' }">Report Template</router-link>
             </li>
+            <li>
+                <router-link :to="{ name: 'GenerateReport' }">Generate Report</router-link>
+            </li>
         </ul>
     </nav>
 </template>

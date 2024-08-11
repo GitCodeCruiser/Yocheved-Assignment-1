@@ -84,4 +84,69 @@ class ReportController extends Controller
 
         return $pdf->download($title);
     }
+
+    public function generateReport(Request $request){
+        $sessions = Session::with(['students', 'rating'])
+        ->where('start_date', '>=', Carbon::parse($request->start_date))
+        ->where('start_date', '<=', Carbon::parse($request->end_date))
+        ->get();
+ 
+        if ($sessions->isEmpty()) {
+            throw new Exception("No session found", Response::HTTP_OK);
+        }
+ 
+        $report = Report::first();
+        $updatedHtml = '';
+ 
+        foreach ($sessions as $session) {
+            $startTime = Carbon::parse($session->start_time);
+            $endTime = Carbon::parse($session->end_time);
+            $diffInMinutes = $startTime->diffInMinutes($endTime);
+            $html = $report->body;
+            
+            $noOfReports = ceil($diffInMinutes / $request->split);
+
+            for ($i = 0; $i < $noOfReports; $i++) {
+                $segmentStartTime = $startTime->copy()->addMinutes($i * $request->split);
+                $segmentEndTime = $segmentStartTime->copy()->addMinutes(min($request->split, $diffInMinutes - $i * $request->split));
+                $segmentDiffInMinutes = $segmentStartTime->diffInMinutes($segmentEndTime);
+
+                $placeholders = [
+                    '@target_start_date',
+                    '@target_end_date',
+                    '@session_minutes',
+                    '@student_full_name',
+                    '@session_date',
+                    '@session_minutes',
+                    '@session_start_time',
+                    '@session_end_time',
+                    '@session_rating',
+                    '@target',
+                ];
+                
+                $replacements = [
+                    $session->target_start_date ?? 'N/A',
+                    $session->target_end_date ?? 'N/A',
+                    $segmentDiffInMinutes,
+                    $session->students[0]->full_name ?? 'N/A',
+                    $session->start_date,
+                    $diffInMinutes,
+                    $startTime->format('H:i:s'),
+                    $endTime->format('H:i:s'),
+                    $session->rating->obtained_rating ?? 'N/A',
+                    $session->rating->total_rating,
+                    $session->target ?? 'N/A', // Placeholder for @target
+                ];
+                
+                // Replacing placeholders with their respective values
+                $updatedHtml .= str_replace($placeholders, $replacements, $html);
+            }
+        }
+ 
+        $updatedHtml = mb_convert_encoding($updatedHtml, 'UTF-8', 'auto');
+        $pdf = PDF::loadHTML($updatedHtml);
+        $title = $report->title . ".pdf";
+
+        return $pdf->download($title);
+    }
 }

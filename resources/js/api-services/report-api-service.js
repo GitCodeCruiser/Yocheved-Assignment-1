@@ -6,7 +6,7 @@ export default{
     getReport: (data) => axios.post(`${baseUrl}/report/get`,data),
     
     printReport: (data) => {
-        return axios.post(`${baseUrl}/report/generate-pdf`, data, {
+        return axios.post(`${baseUrl}/report/generate-report`, data, {
             responseType: 'blob',
         });
     },

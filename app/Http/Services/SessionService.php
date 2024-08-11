@@ -15,45 +15,47 @@ class SessionService
     public function addSession($request)
     {
 
-        $startDateTime = Carbon::parse($request->start_date_time)->format('Y-m-d H:i:s');
-        $endDateTime = Carbon::parse($request->end_date_time)->format('Y-m-d H:i:s');
-        $startTime = Carbon::parse($startDateTime)->format('H:i:s');
-        $endTime = Carbon::parse($endDateTime)->format('H:i:s');
+        $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
+        $startTime = Carbon::parse($request->start_time)->format('H:i:s');
+        $endTime = Carbon::parse($request->end_time)->format('H:i:s');
 
-        if ($startDateTime >= $endDateTime) {
-            throw new Exception('Start date time should be less than end date time', Response::HTTP_OK);
+        if ($startTime >= $endTime) {
+            throw new Exception('Start time should be less than end time', Response::HTTP_OK);
         }
-
-        $overlappingSessions = Session::where(function ($query) use ($startDateTime, $endDateTime, $startTime, $endTime, $request) {
-            $query->where(function ($subQuery) use ($startDateTime, $endDateTime, $startTime, $endTime, $request) {
+        
+        $overlappingSessions = Session::where(function ($query) use ($startDate, $startTime, $endTime, $request) {
+            $query->where(function ($subQuery) use ($startDate, $startTime, $endTime, $request) {
                 if ($request->is_daily) {
-                    $subQuery->whereRaw('TIME(start_date_time) BETWEEN ? AND ?', [$startTime, $endTime])
-                        ->orWhereRaw('TIME(end_date_time) BETWEEN ? AND ?', [$startTime, $endTime])
-                        ->orWhereRaw('? BETWEEN TIME(start_date_time) AND TIME(end_date_time)', [$startTime])
-                        ->orWhereRaw('? BETWEEN TIME(start_date_time) AND TIME(end_date_time)', [$endTime]);
+                    $subQuery->whereRaw('TIME(start_time) BETWEEN ? AND ?', [$startTime, $endTime])
+                        ->orWhereRaw('TIME(end_time) BETWEEN ? AND ?', [$startTime, $endTime])
+                        ->orWhereRaw('? BETWEEN TIME(start_time) AND TIME(end_time)', [$startTime])
+                        ->orWhereRaw('? BETWEEN TIME(start_time) AND TIME(end_time)', [$endTime]);
                 } else {
-                    $subQuery->whereBetween('start_date_time', [$startDateTime, $endDateTime])
-                        ->orWhereBetween('end_date_time', [$startDateTime, $endDateTime])
-                        ->orWhere(function ($subSubQuery) use ($startDateTime, $endDateTime) {
-                            $subSubQuery->where('start_date_time', '<=', $startDateTime)
-                                ->where('end_date_time', '>=', $endDateTime);
+                    $subQuery->where('start_date', $startDate)
+                        ->where(function ($subSubQuery) use ($startTime, $endTime) {
+                            $subSubQuery->whereBetween('start_time', [$startTime, $endTime])
+                                ->orWhereBetween('end_time', [$startTime, $endTime])
+                                ->orWhere(function ($innerSubQuery) use ($startTime, $endTime) {
+                                    $innerSubQuery->where('start_time', '<=', $startTime)
+                                        ->where('end_time', '>=', $endTime);
+                                });
                         });
                 }
             });
         })->exists();
 
-
         if ($overlappingSessions) {
             throw new Exception("The new session overlaps with an existing session.", Response::HTTP_OK);
         }
-
+        
         $session = Session::create([
-            'start_date_time' => Carbon::parse($request->start_date_time)->format('Y-m-d H:i:s'),
-            'end_date_time' => Carbon::parse($request->end_date_time)->format('Y-m-d H:i:s'),
+            'start_date' => $startDate,
+            'start_time' => $startTime,
+            'end_time' => $endTime,
             'target' => $request->target,
             'is_daily' => $request->is_daily
         ]);
-
+        
         return $session;
     }
 
@@ -65,8 +67,22 @@ class SessionService
 
     public function getSession($request)
     {
-        $session = Session::with('rating')->where('id', $request->session_id)->first();
-        return $session;
+        $session = Session::where('id', $request->session_id)->first();
+
+        if ($session) {
+            if ($session->is_daily) {
+                $sessionWithRating = Session::with(['rating' => function ($query) {
+                    $query->whereDate('created_at', now()->format('Y-m-d'));
+                }])->find($session->id);
+            } else {
+                $sessionWithRating = Session::with('rating')->find($session->id);
+            }
+
+            return $sessionWithRating;
+        }
+        else{
+            throw new Exception("No session found", Response::HTTP_OK);
+        }
     }
 
     public function scheduleStudent($request){
@@ -105,18 +121,42 @@ class SessionService
             throw new Exception("Please enter a valid session id", Response::HTTP_OK);
         }
 
-        foreach($session->students as $student){
-            SessionRating::updateOrCreate(
-                [
+        if(!$session->is_daily){
+            foreach($session->students as $student){
+                SessionRating::updateOrCreate(
+                    [
+                        'session_id' => $session->id,
+                        'student_id' => $student->id,
+                    ],
+                    [
                     'session_id' => $session->id,
                     'student_id' => $student->id,
-                ],
-                [
-                'session_id' => $session->id,
-                'student_id' => $student->id,
-                'total_rating' => $session->target,
-                'obtained_rating' => $request->rating
-            ]);
+                    'total_rating' => $session->target,
+                    'obtained_rating' => $request->rating
+                ]);
+            }
+        }
+        else{
+            foreach($session->students as $student){
+                $rating = SessionRating::where('session_id', $session->id)
+                        ->where('student_id', $student->id)
+                        ->whereDate('created_at', now()->format('Y-m-d'))
+                        ->first();
+
+                if ($rating) {
+                    $rating->update([
+                        'obtained_rating' => $request->rating
+                    ]);
+                } else {
+                    $rating = SessionRating::create([
+                        'session_id' => $session->id,
+                        'student_id' => $student->id,
+                        'total_rating' => $session->target,
+                        'obtained_rating' => $request->rating,
+                        'created_at' => now()
+                    ]);
+                }
+            }
         }
 
         return SessionRating::where('session_id', $session->id)->get();
@@ -129,8 +169,9 @@ class SessionService
         foreach($sessions as $session){
             if(isset($session['fromDate']) && isset($session['toDate'])){
                 $addedSessions[] = Session::create([
-                    'start_date_time' => Carbon::parse($session['fromDate'])->format('Y-m-d H:i:s'),
-                    'end_date_time' => Carbon::parse($session['toDate'])->format('Y-m-d H:i:s'),
+                    'start_date' => Carbon::parse($session['fromDate']),
+                    'start_time' => now()->format('H:i:s'),
+                    'end_time' => now()->addMinute(15)->format('H:i:s'),
                     'target' => $session['target'],
                     'is_daily' => false,
                 ]);
