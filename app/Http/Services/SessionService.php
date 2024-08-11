@@ -26,10 +26,12 @@ class SessionService
         $overlappingSessions = Session::where(function ($query) use ($startDate, $startTime, $endTime, $request) {
             $query->where(function ($subQuery) use ($startDate, $startTime, $endTime, $request) {
                 if ($request->is_daily) {
-                    $subQuery->whereRaw('TIME(start_time) BETWEEN ? AND ?', [$startTime, $endTime])
-                        ->orWhereRaw('TIME(end_time) BETWEEN ? AND ?', [$startTime, $endTime])
-                        ->orWhereRaw('? BETWEEN TIME(start_time) AND TIME(end_time)', [$startTime])
-                        ->orWhereRaw('? BETWEEN TIME(start_time) AND TIME(end_time)', [$endTime]);
+                    $subQuery->where(function ($timeQuery) use ($startTime, $endTime, $startDate) {
+                        $timeQuery->whereRaw('TIME(start_time) BETWEEN ? AND ?', [$startTime, $endTime])
+                            ->orWhereRaw('TIME(end_time) BETWEEN ? AND ?', [$startTime, $endTime])
+                            ->orWhereRaw('? BETWEEN TIME(start_time) AND TIME(end_time)', [$startTime])
+                            ->orWhereRaw('? BETWEEN TIME(start_time) AND TIME(end_time)', [$endTime]);
+                    })->where('start_date', '>=', $startDate); // Only consider future or current dates
                 } else {
                     $subQuery->where('start_date', $startDate)
                         ->where(function ($subSubQuery) use ($startTime, $endTime) {
