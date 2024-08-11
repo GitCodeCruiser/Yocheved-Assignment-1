@@ -127,8 +127,8 @@ class ReportController extends Controller
                 ];
                 
                 $replacements = [
-                    $session->target_start_date ?? 'N/A',
-                    $session->target_end_date ?? 'N/A',
+                    $request->start_date ?? 'N/A',
+                    $request->end_date ?? 'N/A',
                     $segmentDiffInMinutes,
                     $session->students[0]->full_name ?? 'N/A',
                     $session->start_date,
