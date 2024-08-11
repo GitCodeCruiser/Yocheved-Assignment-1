@@ -1,6 +1,6 @@
 <template>
     <div>
-        hi from dashboard
+        <h1 class="text-center">hi from dashboard</h1>
     </div>
 </template>
 

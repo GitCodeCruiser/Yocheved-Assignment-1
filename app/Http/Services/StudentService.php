@@ -39,7 +39,7 @@ class StudentService{
         if(!$student){
             throw new Exception("Please enter a valid student id", Response::HTTP_OK);
         }
-        StudentAvailability::where('student_id', $request->student_id)->delete();
+        StudentAvailability::where('student_id', $student->id)->delete();
 
         foreach($request->days as $day){
             StudentAvailability::create([

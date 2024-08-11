@@ -98,7 +98,7 @@ class SessionService
             throw new Exception("Please enter a valid student id", Response::HTTP_OK);
         }
 
-        $existingSchedule = StudentSchedule::where('student_id', $request->student_id)
+        $existingSchedule = StudentSchedule::where('student_id', $student->id)
                                    ->where('session_id', $request->session_id)
                                    ->first();
 

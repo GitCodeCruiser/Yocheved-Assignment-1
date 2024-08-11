@@ -77,7 +77,7 @@ function isValidTime(value) {
     return hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60;
 }
 
-extend('notPastDate', {
+extend('notFutureDate', {
     validate(value) {
         const today = new Date();
         const inputDate = new Date(value);
@@ -86,7 +86,7 @@ extend('notPastDate', {
         today.setHours(0, 0, 0, 0);
         inputDate.setHours(0, 0, 0, 0);
 
-        return inputDate >= today;
+        return inputDate <= today;
     },
-    message: 'The date must not be in the past.',
+    message: 'The date must not be in the future.',
 });

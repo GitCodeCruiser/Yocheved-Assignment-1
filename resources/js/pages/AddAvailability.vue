@@ -60,13 +60,12 @@ export default {
                 .then(({ data }) => {
                     if (data.status) {
                         this.$toast.success(data.message);
-                        this.$router.push({name: 'Students'});
+                        this.$router.push({ name: 'Students' });
                     } else {
                         this.$toast.error(data.message);
                     }
                 })
                 .catch(error => {
-                    // Handle errors and show a toast message
                     console.error('Error:', error);
                     this.$toast.error('An error occurred while adding availability. Please try again.');
                 });

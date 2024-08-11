@@ -36,7 +36,7 @@
                         </div>
                     </ValidationProvider>
 
-                    <ValidationProvider name="Date of birth" rules="required|date" v-slot="{ errors }">
+                    <ValidationProvider name="Date of birth" rules="required|date|notFutureDate" v-slot="{ errors }">
                         <div class="mb-2">
                             <CustomInput id="date_of_birth" v-model="data.date_of_birth" type="date" placeholder="Enter Last Name"
                                 label="Date of Birth" />

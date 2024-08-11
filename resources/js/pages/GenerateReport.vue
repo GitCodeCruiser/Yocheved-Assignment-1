@@ -7,7 +7,8 @@
                     <div>
                         <label for="studentDropdown">Select Student</label>
                         <ValidationProvider name="Student" rules="required" v-slot="{ errors }">
-                            <select v-model="data.selectedStudent" id="studentDropdown" class="form-control" @scroll="handleScroll">
+                            <select v-model="data.selectedStudent" id="studentDropdown" class="form-control"
+                                @scroll="handleScroll">
                                 <option v-for="student in students" :value="student.id" :key="student.id">
                                     {{ student.full_name }}
                                 </option>
@@ -19,8 +20,7 @@
                     <div class="form-group">
                         <label for="start_time">Start Date</label>
                         <ValidationProvider name="Start Date" rules="required" v-slot="{ errors }">
-                            <input v-model="data.start_date" type="date" class="form-control mt-2"
-                                id="start_time">
+                            <input v-model="data.start_date" type="date" class="form-control mt-2" id="start_time">
                             <span class="text-danger">{{ errors[0] }}</span>
                         </ValidationProvider>
                     </div>
@@ -28,8 +28,7 @@
                     <div class="form-group">
                         <label for="end_time">End Date</label>
                         <ValidationProvider name="End Date" rules="required" v-slot="{ errors }">
-                            <input v-model="data.end_date" type="date" class="form-control mt-2"
-                                id="end_time">
+                            <input v-model="data.end_date" type="date" class="form-control mt-2" id="end_time">
                             <span class="text-danger">{{ errors[0] }}</span>
                         </ValidationProvider>
                     </div>
@@ -38,7 +37,8 @@
                         <label for="split_option">Split Option</label>
                         <ValidationProvider name="Split Option" rules="required" v-slot="{ errors }">
                             <select v-model="data.split" class="form-control mt-2">
-                                <option v-for="split_option in split_options" :value="split_option.key" :key="split_option.key">{{ split_option.label }}</option>
+                                <option v-for="split_option in split_options" :value="split_option.key"
+                                    :key="split_option.key">{{ split_option.label }}</option>
                             </select>
                             <span class="text-danger">{{ errors[0] }}</span>
                         </ValidationProvider>
@@ -73,16 +73,16 @@ export default {
                 selectedStudent: null,
             },
 
-            students:[],
+            students: [],
             currentPage: 1,
             lastPage: null,
             loading: false,
 
             split_options: [
-                {'label': '15 min', 'key': '15'},
-                {'label': '10 min', 'key': '10'},
-                {'label': '5 min', 'key': '5'},
-                {'label': '2 min', 'key': '2'},
+                { 'label': '15 min', 'key': '15' },
+                { 'label': '10 min', 'key': '10' },
+                { 'label': '5 min', 'key': '5' },
+                { 'label': '2 min', 'key': '2' },
             ],
         }
     },
@@ -93,30 +93,30 @@ export default {
         }
     },
 
-    mounted(){
+    mounted() {
         this.getStudents();
     },
 
     methods: {
         addSession() {
-            SessionApiService.addSession(this.data).then(({data}) => {
-                if(data.status){
-                    this.$router.push({name: 'Sessions'})
+            SessionApiService.addSession(this.data).then(({ data }) => {
+                if (data.status) {
+                    this.$router.push({ name: 'Sessions' })
                 }
-                else{
+                else {
                     this.$toast.error(data.message);
                 }
             });
         },
 
-        getStudents(){
-            StudentApiService.allStudents().then(({data}) => {
-                if(data.status){
+        getStudents() {
+            StudentApiService.allStudents().then(({ data }) => {
+                if (data.status) {
                     this.students = [...this.students, ...data.data];
                     this.currentPage = data.current_page;
                     this.lastPage = data.last_page;
                 }
-                else{
+                else {
                     this.$toast.error(data.message);
                 }
             });
@@ -129,12 +129,12 @@ export default {
             }
         },
 
-        generateReport(){
-            ReportApiService.printReport().then(({data}) => {
-                if(data.status){
+        generateReport() {
+            ReportApiService.printReport().then(({ data }) => {
+                if (data.status) {
 
                 }
-                else{
+                else {
                     this.$toast.error(data.message);
                 }
             })
@@ -148,9 +148,9 @@ export default {
                 link.download = 'report.pdf';
                 link.click();
             })
-            .catch(error => {
-                console.error('There was an error generating the PDF:', error);
-            });
+                .catch(error => {
+                    console.error('There was an error generating the PDF:', error);
+                });
         }
     },
 }

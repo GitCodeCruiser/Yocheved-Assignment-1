@@ -12,7 +12,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
         $schedule->command('notify:users-before-session')->everyFiveMinutes();
         $schedule->command('app:check-completed-sessions')->everyFiveMinutes();
     }

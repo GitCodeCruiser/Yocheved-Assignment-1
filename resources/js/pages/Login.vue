@@ -65,12 +65,6 @@ export default {
     },
 
     methods: {
-        getAvailableStudents(){
-            StudentApiService.getAvailableStudents().then(({ data }) => {
-                // this.availabilities.student_availability = data.data;
-            });
-        },
-
         submitForm() {
             this.isDisabled = true;
             authApiService.Login(this.data).then(({ data }) => {

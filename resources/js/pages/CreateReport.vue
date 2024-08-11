@@ -84,7 +84,6 @@ export default {
         getReport(){
             ReportApiService.getReport().then(({data}) => {
                 if(data.status){
-                    this.$toast.success(data.message);
                     this.data.title = data.data.title;
                     this.data.body = data.data.body;
                 }

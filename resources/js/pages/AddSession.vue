@@ -6,7 +6,7 @@
                 <form @submit.prevent="addSession">
                     <div class="form-group">
                         <label for="start_time">Start Date</label>
-                        <ValidationProvider name="Start Time" rules="required|notPastDate" v-slot="{ errors }">
+                        <ValidationProvider name="Start Time" rules="required" v-slot="{ errors }">
                             <input v-model="data.start_date" type="date" class="form-control mt-2"
                                 id="start_time" :min="minDate">
                             <span class="text-danger">{{ errors[0] }}</span>
@@ -81,8 +81,7 @@ export default {
 
     computed: {
         minDate() {
-        // Format the current date as YYYY-MM-DD
-        return new Date().toISOString().split('T')[0];
+            return new Date().toISOString().split('T')[0];
         }
     },
 
