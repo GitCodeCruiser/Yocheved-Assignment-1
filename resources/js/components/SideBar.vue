@@ -1,10 +1,11 @@
 <template>
     <nav id="sidebar">
         <div class="sidebar-header">
-            <h3>Student Tracker</h3>
+            <h3>Student Tracker</h3> <!-- Sidebar title -->
         </div>
 
         <ul class="list-unstyled components">
+            <!-- Navigation links using Vue Router -->
             <li>
                 <router-link :to="{ name: 'Students' }">Students</router-link>
             </li>
@@ -23,10 +24,3 @@
         </ul>
     </nav>
 </template>
-
-<script>
-export default {
-}
-</script>
-
-<style lang="scss" scoped></style>

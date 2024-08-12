@@ -12,17 +12,19 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SessionService
 {
+    // Add a new session
     public function addSession($request)
     {
-
         $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
         $startTime = Carbon::parse($request->start_time)->format('H:i:s');
         $endTime = Carbon::parse($request->end_time)->format('H:i:s');
 
+        // Ensure start time is before end time
         if ($startTime >= $endTime) {
             throw new Exception('Start time should be less than end time', Response::HTTP_OK);
         }
         
+        // Check for overlapping sessions
         $overlappingSessions = Session::where(function ($query) use ($startDate, $startTime, $endTime, $request) {
             $query->where(function ($subQuery) use ($startDate, $startTime, $endTime, $request) {
                 if ($request->is_daily) {
@@ -46,10 +48,12 @@ class SessionService
             });
         })->exists();
 
+        // Throw exception if overlapping sessions are found
         if ($overlappingSessions) {
             throw new Exception("The new session overlaps with an existing session.", Response::HTTP_OK);
         }
         
+        // Create a new session
         $session = Session::create([
             'start_date' => $startDate,
             'start_time' => $startTime,
@@ -61,12 +65,14 @@ class SessionService
         return $session;
     }
 
+    // Get paginated list of sessions
     public function getSessions()
     {
         $sessions = Session::paginate(10);
         return $sessions;
     }
 
+    // Get a specific session by ID
     public function getSession($request)
     {
         $session = Session::where('id', $request->session_id)->first();
@@ -81,33 +87,36 @@ class SessionService
             }
 
             return $sessionWithRating;
-        }
-        else{
+        } else {
             throw new Exception("No session found", Response::HTTP_OK);
         }
     }
 
-    public function scheduleStudent($request){
+    // Schedule a student for a session
+    public function scheduleStudent($request)
+    {
         $session = Session::where('id', $request->session_id)->first();
         
-        if(!$session){
+        if (!$session) {
             throw new Exception("Please enter a valid session id", Response::HTTP_OK);
         }
 
         $student = Student::where('id', $request->student_id)->first();
         
-        if(!$student){
+        if (!$student) {
             throw new Exception("Please enter a valid student id", Response::HTTP_OK);
         }
 
+        // Check if the student is already scheduled for this session
         $existingSchedule = StudentSchedule::where('student_id', $student->id)
-                                   ->where('session_id', $request->session_id)
-                                   ->first();
+                                           ->where('session_id', $request->session_id)
+                                           ->first();
 
         if ($existingSchedule) {
             throw new Exception("This student is already scheduled for this session", Response::HTTP_OK);
         }
 
+        // Schedule the student for the session
         $studentSchedule = StudentSchedule::create([
             'student_id' => $request->student_id,
             'session_id' => $request->session_id
@@ -116,30 +125,33 @@ class SessionService
         return $studentSchedule;
     }
 
-    public function rateSession($request){
+    // Rate a session
+    public function rateSession($request)
+    {
         $session = Session::where('id', $request->session_id)->with(['students'])->first();
         
-        if(!$session){
+        if (!$session) {
             throw new Exception("Please enter a valid session id", Response::HTTP_OK);
         }
 
-        if(!$session->is_daily){
-            foreach($session->students as $student){
+        // Rate the session for each student
+        if (!$session->is_daily) {
+            foreach ($session->students as $student) {
                 SessionRating::updateOrCreate(
                     [
                         'session_id' => $session->id,
                         'student_id' => $student->id,
                     ],
                     [
-                    'session_id' => $session->id,
-                    'student_id' => $student->id,
-                    'total_rating' => $session->target,
-                    'obtained_rating' => $request->rating
-                ]);
+                        'session_id' => $session->id,
+                        'student_id' => $student->id,
+                        'total_rating' => $session->target,
+                        'obtained_rating' => $request->rating
+                    ]
+                );
             }
-        }
-        else{
-            foreach($session->students as $student){
+        } else {
+            foreach ($session->students as $student) {
                 $rating = SessionRating::where('session_id', $session->id)
                         ->where('student_id', $student->id)
                         ->whereDate('created_at', now()->format('Y-m-d'))
@@ -164,12 +176,14 @@ class SessionService
         return SessionRating::where('session_id', $session->id)->get();
     }
 
-    public function addMultipleSessions($request){
+    // Add multiple sessions
+    public function addMultipleSessions($request)
+    {
         $sessions = $request->all();
         $addedSessions = [];
 
-        foreach($sessions as $session){
-            if(isset($session['fromDate']) && isset($session['toDate'])){
+        foreach ($sessions as $session) {
+            if (isset($session['fromDate']) && isset($session['toDate'])) {
                 $addedSessions[] = Session::create([
                     'start_date' => Carbon::parse($session['fromDate']),
                     'start_time' => now()->format('H:i:s'),

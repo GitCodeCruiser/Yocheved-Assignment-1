@@ -1,22 +1,27 @@
 <template>
     <div>
         <div class="d-flex justify-content-end">
-            <!-- Additional controls can be placed here -->
+            <!-- Additional controls can be placed here if needed -->
         </div>
         <table class="table table-striped table-bordered">
             <thead>
                 <tr>
+                    <!-- Render table headers dynamically -->
                     <th v-for="(header, index) in headers" :key="index">{{ header.label }}</th>
-                    <th v-if="actions.length">{{ actions.length > 1 ? 'Actions' : actions[0].text }}</th> <!-- Conditionally render header -->
+                    <!-- Conditionally render 'Actions' header if actions are available -->
+                    <th v-if="actions.length">{{ actions.length > 1 ? 'Actions' : actions[0].text }}</th>
                 </tr>
             </thead>
             <tbody>
+                <!-- Display a message if no data is available -->
                 <tr v-if="!data.length">
                     <td :colspan="headers.length + (actions.length ? 1 : 0)" class="text-center">No records found</td>
                 </tr>
                 <template v-else>
+                    <!-- Render table rows dynamically -->
                     <tr v-for="(row, rowIndex) in data" :key="rowIndex">
                         <td v-for="(header, colIndex) in headers" :key="colIndex">{{ row[header.key] }}</td>
+                        <!-- Render action buttons if any actions are defined -->
                         <td v-if="actions.length">
                             <div class="d-flex">
                                 <div v-for="(action, actionIndex) in actions" :key="actionIndex">
@@ -33,6 +38,7 @@
                 </template>
             </tbody>
         </table>
+        <!-- Render pagination controls if pagination is available -->
         <nav v-if="pagination && pagination.total > pagination.per_page">
             <ul class="pagination justify-content-center">
                 <li class="page-item" :class="{ disabled: !pagination.prev_page_url }">
@@ -60,23 +66,24 @@ export default {
     props: {
         headers: {
             type: Array,
-            required: true,
+            required: true, // Headers are required for table rendering
         },
         data: {
             type: Array,
-            required: true,
+            required: true, // Data array is required to populate table rows
         },
         actions: {
             type: Array,
-            default: () => [],
+            default: () => [], // Default to an empty array if no actions are provided
         },
         pagination: {
             type: Object,
-            required: false,
+            required: false, // Pagination is optional
             default: null,
         },
     },
     computed: {
+        // Calculate the pages array for pagination
         pages() {
             if (!this.pagination) return [];
             let pages = [];
@@ -87,8 +94,9 @@ export default {
         }
     },
     methods: {
+        // Handle action button clicks, emit the action event with relevant data
         handleAction(action, row) {
-            this.$emit('action', { action, data: row }); // Emit action with handler and row
+            this.$emit('action', { action, data: row });
         }
     }
 };

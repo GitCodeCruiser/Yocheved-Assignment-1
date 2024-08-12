@@ -12,11 +12,15 @@ use Illuminate\Queue\SerializesModels;
 class RateStudent extends Mailable
 {
     use Queueable, SerializesModels;
+
     public $student;
     public $admin;
 
     /**
      * Create a new message instance.
+     * 
+     * @param $student - The student object to be rated
+     * @param $admin - The admin user who will rate the student
      */
     public function __construct($student, $admin)
     {
@@ -26,6 +30,8 @@ class RateStudent extends Mailable
 
     /**
      * Get the message envelope.
+     * 
+     * @return Envelope - The email envelope containing the subject
      */
     public function envelope(): Envelope
     {
@@ -36,6 +42,8 @@ class RateStudent extends Mailable
 
     /**
      * Get the message content definition.
+     * 
+     * @return Content - The content of the email, including the view and data
      */
     public function content(): Content
     {
@@ -50,8 +58,8 @@ class RateStudent extends Mailable
 
     /**
      * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     * 
+     * @return array<int, \Illuminate\Mail\Mailables\Attachment> - An array of attachments (if any)
      */
     public function attachments(): array
     {

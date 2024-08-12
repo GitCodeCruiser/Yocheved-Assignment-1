@@ -11,41 +11,40 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Services\ReportService;
 
-use function PHPUnit\Framework\isEmpty;
-
 class ReportController extends Controller
 {
     private $reportService;
+
     public function __construct(ReportService $reportService)
     {
         $this->reportService = $reportService;
     }
 
-    public function addReport (Request $request){
-        try 
-        {
+    // Add a new report
+    public function addReport(Request $request)
+    {
+        try {
             $report = $this->reportService->addReport($request);
             return $this->sendResponse("report updated successfully", Response::HTTP_OK, $report);
-        } 
-        catch (Exception $exception) 
-        {
+        } catch (Exception $exception) {
             return $this->sendResponse($exception->getMessage(), $exception->getCode(), null, false);
         }
     }
 
-    public function getReport(Request $request){
-        try 
-        {
+    // Fetch a report
+    public function getReport(Request $request)
+    {
+        try {
             $report = $this->reportService->getReport($request);
             return $this->sendResponse("report fetched successfully", Response::HTTP_OK, $report);
-        } 
-        catch (Exception $exception) 
-        {
+        } catch (Exception $exception) {
             return $this->sendResponse($exception->getMessage(), $exception->getCode(), null, false);
         }
     }
 
-    public function generatePDF(Request $request){
+    // Generate a PDF from report and session data
+    public function generatePDF(Request $request)
+    {
         $session = Session::where('id', $request->session_id)->with(['rating', 'students'])->first();
         $report = Report::first();
         $html = $report->body;
@@ -56,9 +55,6 @@ class ReportController extends Controller
             '@session_minutes',
             '@session_start_time',
             '@session_end_time',
-            // '@target_start_date',
-            // '@target_end_date',
-            // '@target_end_date',
             '@session_rating',
         ];
         
@@ -79,19 +75,19 @@ class ReportController extends Controller
         
         $updatedHtml = str_replace($placeholders, $replacements, $html);
 
-        $html = $report->body;
-
         $pdf = PDF::loadHTML($updatedHtml);
         $title = $report->title."pdf";
 
         return $pdf->download($title);
     }
 
-    public function generateReport(Request $request){
+    // Generate report based on session data within a date range
+    public function generateReport(Request $request)
+    {
         $sessions = Session::with(['students', 'rating'])
-        ->where('start_date', '>=', Carbon::parse($request->start_date))
-        ->where('start_date', '<=', Carbon::parse($request->end_date))
-        ->get();
+            ->where('start_date', '>=', Carbon::parse($request->start_date))
+            ->where('start_date', '<=', Carbon::parse($request->end_date))
+            ->get();
  
         if ($sessions->isEmpty()) {
             throw new Exception("No session found", Response::HTTP_OK);
@@ -119,7 +115,6 @@ class ReportController extends Controller
                     '@session_minutes',
                     '@student_full_name',
                     '@session_date',
-                    '@session_minutes',
                     '@session_start_time',
                     '@session_end_time',
                     '@session_rating',
@@ -137,11 +132,11 @@ class ReportController extends Controller
                     $endTime->format('H:i:s'),
                     $session->rating->obtained_rating ?? 'N/A',
                     $session->rating->total_rating ?? 'N/A',
-                    $session->target ?? 'N/A', // Placeholder for @target
+                    $session->target ?? 'N/A',
                 ];
                 
-                // Replacing placeholders with their respective values
-                if(isset($session->rating)){
+                // Append the updated HTML for each session segment
+                if (isset($session->rating)) {
                     $updatedHtml .= str_replace($placeholders, $replacements, $html);
                 }
             }

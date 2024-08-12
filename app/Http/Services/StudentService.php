@@ -10,18 +10,25 @@ use App\Models\StudentAvailability;
 use Illuminate\Console\Scheduling\Schedule;
 use Symfony\Component\HttpFoundation\Response;
 
-class StudentService{
-    public function getStudents(){
+class StudentService
+{
+    // Get paginated list of students
+    public function getStudents()
+    {
         $students = Student::paginate(10);
         return $students;
     }
 
-    public function allStudents(){
+    // Get a list of all students
+    public function allStudents()
+    {
         $students = Student::get();
         return $students;
     }
 
-    public function addStudent($request){
+    // Add a new student
+    public function addStudent($request)
+    {
         $student = Student::create([
             'email' => $request->email,
             'first_name' => $request->first_name,
@@ -33,36 +40,48 @@ class StudentService{
         return $student;
     }
 
-    public function addStudentAvailability($request){
+    // Add availability for a student
+    public function addStudentAvailability($request)
+    {
         $student = Student::where('slug', $request->student_id)->first();
         
-        if(!$student){
+        if (!$student) {
             throw new Exception("Please enter a valid student id", Response::HTTP_OK);
         }
+
+        // Remove existing availability records for the student
         StudentAvailability::where('student_id', $student->id)->delete();
 
-        foreach($request->days as $day){
+        // Add new availability records
+        foreach ($request->days as $day) {
             StudentAvailability::create([
                 'student_id' => $student->id,
                 'day' => $day
             ]);
         }
 
+        // Return the updated availability information
         $studentAvailabilities = Student::where('id', $student->id)->with("studentAvailability")->first();
         return $studentAvailabilities;
     }
 
-    public function getStudentAvailability($request){
+    // Get availability for a specific student
+    public function getStudentAvailability($request)
+    {
         $student = Student::where('slug', $request->student_id)->first();
-        if(!$student){
+        
+        if (!$student) {
             throw new Exception("Please enter a valid student id", Response::HTTP_OK);
         }
 
+        // Return the student's availability
         $studentAvailabilities = Student::where('id', $student->id)->with("studentAvailability")->first();
         return $studentAvailabilities;
     }
 
-    public function getAvailableStudents($request){
+    // Get students available for a specific session
+    public function getAvailableStudents($request)
+    {
         $session = Session::where('id', $request->session_id)->first();
 
         if (!$session) {
@@ -72,6 +91,7 @@ class StudentService{
         $date = Carbon::parse('2024-08-09');
         $day = $date->dayOfWeek;
 
+        // Find students available on the required day or all days if the session is daily
         $students = Student::whereHas('studentAvailability', function($query) use ($session) {
             if ($session->is_daily) {
                 // Check if the student is available all 7 days

@@ -19,13 +19,17 @@ class NotifyUsersBeforeSession extends Command
         parent::__construct();
     }
 
+    // Handle the command execution
     public function handle()
     {
+        // Get the admin user and their email
         $adminUser = User::first();
         $users[] = $adminUser->email;
 
+        // Calculate the event start time 5 minutes from now
         $eventStartTime = Carbon::now()->addMinute(5)->format("H:i:s");
 
+        // Fetch sessions that need to be notified
         $sessions = Session::where(function($query) use ($eventStartTime) {
             $query->where(function($query) use ($eventStartTime) {
                 $query->where('is_daily', false)->where('start_time', '<=', $eventStartTime);
@@ -35,21 +39,26 @@ class NotifyUsersBeforeSession extends Command
             });
         })->whereNull('notified_at')->with(['students'])->get();
 
+        // Loop through each session to send notifications
         foreach ($sessions as $session) {
             
+            // Update the session to mark it as notified
             $session->update([
                 'notified_at' => now(),
             ]);
 
+            // Collect emails of all students in the session
             foreach ($session->students as $student) {
                 $users[] = $student?->email;
             }
 
+            // Send email notification to each user
             foreach ($users as $user) {
                 Mail::to($user)->queue(new SessionReminder($adminUser, $session));
             }
         }
 
+        // Output a success message to the console
         $this->info('Users notified successfully.');
     }
 }

@@ -22,7 +22,7 @@ class CheckCompletedSessions extends Command
      *
      * @var string
      */
-    protected $description = 'this will update the session status and send email to admin to rate the session';
+    protected $description = 'This will update the session status and send an email to the admin to rate the session';
 
     /**
      * Execute the console command.
@@ -32,12 +32,14 @@ class CheckCompletedSessions extends Command
         $now = now();
         $adminUser = User::first();
         
+        // Retrieve sessions that need to be updated and notified
         $sessions = Session::where('start_date', $now->format('Y-m-d'))
-        ->where('end_time', '<', $now->format('H:i:s'))
-        ->where('status', 0)
-        ->with(['students'])
-        ->get();
+            ->where('end_time', '<', $now->format('H:i:s'))
+            ->where('status', 0)
+            ->with(['students'])
+            ->get();
 
+        // Update session status and send email notifications
         foreach ($sessions as $session) {
             $session->status = 1;
             $session->save();
@@ -45,9 +47,9 @@ class CheckCompletedSessions extends Command
             foreach ($session->students as $student) {
                 Mail::to($adminUser->email)->queue(new RateStudent($student, $adminUser));
             }
-
         }
 
+        // Output a success message to the console
         $this->info('Completed sessions checked and notifications sent.');
     }
 }

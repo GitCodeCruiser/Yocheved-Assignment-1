@@ -1,15 +1,5 @@
 <template>
     <div>
-        <h1 class="text-center">hi from dashboard</h1>
+        <h1 class="text-center">Hi from dashboard</h1> <!-- Centered heading for the dashboard -->
     </div>
 </template>
-
-<script>
-    export default {
-        
-    }
-</script>
-
-<style lang="scss" scoped>
-
-</style>
