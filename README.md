@@ -57,6 +57,10 @@ Start the local development server
 
 You can now access the server at url given by above command, default is: http://localhost:8000
 
+Start the schedule
+
+    php artisan schedule:work
+
 **TL;DR command list**
 
     git clone https://github.com/GitCodeCruiser/Student-UserSessionManagment.git
@@ -64,7 +68,8 @@ You can now access the server at url given by above command, default is: http://
     composer install
     cp .env.example .env
     php artisan key:generate
-    php artisan migrate
+    php artisan serve
+    php artisan schedule:work
 
 **Make sure you set the correct database connection information before running the migrations** [Environment variables](#environment-variables)
 
